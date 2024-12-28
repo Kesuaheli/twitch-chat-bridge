@@ -82,7 +82,7 @@ public class Bot {
     if (user != null) {
       Map<String, String> v3Tags = event.getMessageEvent().getTags();
       if (v3Tags != null) {
-        String nick = user.getName();
+        String nick = event.getMessageEvent().getUserDisplayName().orElse(user.getName());
         if (!ModConfig.getConfig().getIgnoreList().contains(nick)) {
           String colorTag = v3Tags.get("color");
           TextColor formattingColor;
