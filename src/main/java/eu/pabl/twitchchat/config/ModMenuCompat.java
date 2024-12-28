@@ -67,12 +67,6 @@ public class ModMenuCompat implements ModMenuApi {
 
       ConfigCategory credentialsCategory = builder.getOrCreateCategory(Text.translatable("config.twitchchat.category.credentials"));
       credentialsCategory.addEntry(entryBuilder
-              .startStrField(Text.translatable("config.twitchchat.credentials.username"), ModConfig.getConfig().getUsername())
-              .setSaveConsumer((s -> ModConfig.getConfig().setUsername(s)))
-              .setTooltip(Text.translatable("config.twitchchat.credentials.username.tooltip"))
-              .setDefaultValue(ModConfig.DEFAULT_USERNAME)
-              .build());
-      credentialsCategory.addEntry(entryBuilder
               .startStrField(Text.translatable("config.twitchchat.credentials.oauthKey"), ModConfig.getConfig().getOauthKey())
               .setSaveConsumer((s -> ModConfig.getConfig().setOauthKey(s)))
               .setTooltip(Text.translatable("config.twitchchat.credentials.oauthKey.tooltip"))

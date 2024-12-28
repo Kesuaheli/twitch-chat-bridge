@@ -2,60 +2,43 @@ package eu.pabl.twitchchat.mixin;
 
 import eu.pabl.twitchchat.TwitchChatMod;
 import eu.pabl.twitchchat.config.ModConfig;
-import eu.pabl.twitchchat.twitch_integration.CalculateMinecraftColor;
-import java.util.Date;
-import net.fabricmc.fabric.impl.client.indigo.IndigoMixinConfigPlugin;
-import net.minecraft.client.MinecraftClient;
+import eu.pabl.twitchchat.twitch_integration.FormatMessage;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ChatScreen.class)
 public class ChatMixin {
-	@Inject(at = @At("HEAD"), method = "sendMessage", cancellable = true)
-	private void sendMessage(String text, boolean addToHistory, CallbackInfo info) {
-      ModConfig config = ModConfig.getConfig();
+  @Inject(at = @At("HEAD"), method = "sendMessage", cancellable = true)
+  private void sendMessage(String message, boolean addToHistory, CallbackInfo info) {
+    ModConfig config = ModConfig.getConfig();
+    String prefix = config.getPrefix();
 
+    // Allow users to write /twitch commands (such as disabling and enabling the mod) when their prefix is "".
+    if (!message.startsWith(prefix) ||
+        prefix.equals("") && message.startsWith("/twitch")
+    ) {
+      return;
+    }
 
-      String prefix = config.getPrefix();
+    // from now on we know the message is supposed to be a twitch message, so cancel the normal sendMessage method
+    info.cancel();
 
-      // Allow users to write /twitch commands (such as disabling and enabling the mod) when their prefix is "".
-      if (prefix.equals("") && text.startsWith("/twitch")) {
-        return; // Don't cancel the message, return execution to the real method
-      }
+    if (TwitchChatMod.bot == null || !TwitchChatMod.bot.isConnected()) {
+      TwitchChatMod.addNotification(Text.translatable("text.twitchchat.chat.integration_disabled"));
+      return;
+    }
+    message = message.replaceFirst("^"+prefix, "");
 
-      // If the message is a twitch message
-      if (text.startsWith(prefix)) {
-        if (TwitchChatMod.bot != null && TwitchChatMod.bot.isConnected()) {
-          String textWithoutPrefix = text.substring(text.indexOf(prefix) + prefix.length());
-          TwitchChatMod.bot.sendMessage(textWithoutPrefix); // Send the message to the Twitch IRC Chat
+    TwitchChatMod.bot.sendMessage(message); // Send the message to the Twitch IRC Chat
 
-          Date currentTime = new Date();
-          String formattedTime = TwitchChatMod.formatDateTwitch(currentTime);
+    final String ACTION_MESSAGE_PREFIX = "/me ";
+    boolean isActionMessage = message.startsWith(ACTION_MESSAGE_PREFIX);
+    if (isActionMessage) message = message.replaceFirst("^"+ACTION_MESSAGE_PREFIX, "");
 
-          String username = TwitchChatMod.bot.getUsername();
-          TextColor userColor;
-          if (TwitchChatMod.bot.isFormattingColorCached(username)) {
-            userColor = TwitchChatMod.bot.getFormattingColor(username);
-          } else {
-            userColor = CalculateMinecraftColor.getDefaultUserColor(username);
-            TwitchChatMod.bot.putFormattingColor(username, userColor);
-          }
-
-          boolean isMeMessage = textWithoutPrefix.startsWith("/me");
-
-          // Add the message to the Minecraft Chat
-          TwitchChatMod.addTwitchMessage(formattedTime, username, isMeMessage ? textWithoutPrefix.substring(4) : textWithoutPrefix, userColor, new String[]{}, isMeMessage);
-          MinecraftClient.getInstance().inGameHud.getChatHud().addToMessageHistory(text);
-          info.cancel();
-        } else {
-          TwitchChatMod.addNotification(Text.translatable("text.twitchchat.chat.integration_disabled"));
-        }
-      }
-	}
+    FormatMessage.formatAndSend(message, isActionMessage);
+  }
 }

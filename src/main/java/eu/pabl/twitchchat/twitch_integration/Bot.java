@@ -2,12 +2,10 @@ package eu.pabl.twitchchat.twitch_integration;
 
 import eu.pabl.twitchchat.badge.Badge;
 import eu.pabl.twitchchat.badge.BadgeFont;
-import eu.pabl.twitchchat.config.ModConfig;
 import java.awt.Color;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,22 +16,22 @@ import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
 import com.github.twitch4j.chat.events.channel.*;
-import com.github.twitch4j.common.events.domain.EventUser;
 import eu.pabl.twitchchat.TwitchChatMod;
 
 public class Bot {
   private TwitchClient twitchClient;
   private final TwitchClientBuilder twitchClientBuilder;
-  private final String username;
+  private String username;
+  private List<Badge> userBadges;
   private final String oauthKey;
   private String channel;
-  private ExecutorService myExecutor;
-  private HashMap<String, TextColor> formattingColorCache; // Map of usernames to colors to keep consistency with usernames and colors
+  private String channelID;
+  private final ExecutorService myExecutor;
+  private final HashMap<String, TextColor> formattingColorCache; // Map of usernames to colors to keep consistency with usernames and colors
   private boolean isConnected;
 
-  public Bot(String username, String oauthKey, String channel) {
+  public Bot(String oauthKey, String channel) {
     this.channel = channel.toLowerCase();
-    this.username = username.toLowerCase();
     this.oauthKey = oauthKey.replaceFirst("^oauth:", "");
     formattingColorCache = new HashMap<>();
 
@@ -58,7 +56,7 @@ public class Bot {
       eventManager.onEvent(ChannelNoticeEvent.class, this::onNotice);
       eventManager.onEvent(ChannelLeaveEvent.class, this::onDisconnect);
       eventManager.onEvent(ChannelMessageActionEvent.class, this::onAction);
-      eventManager.onEvent(ChannelStateEvent.class, this::onJoin);
+      eventManager.onEvent(UserStateEvent.class, this::onJoin);
 
       if (!Objects.equals(this.channel, "")) {
         joinChannel(channel);
@@ -76,54 +74,26 @@ public class Bot {
   }
 
   public void onMessage(ChannelMessageEvent event) {
-    String message = event.getMessage();
-    System.out.println("TWITCH MESSAGE: " + message);
-    EventUser user = event.getUser();
-    if (user != null) {
-      Map<String, String> v3Tags = event.getMessageEvent().getTags();
-      if (v3Tags != null) {
-        String nick = event.getMessageEvent().getUserDisplayName().orElse(user.getName());
-        if (!ModConfig.getConfig().getIgnoreList().contains(nick)) {
-          String colorTag = v3Tags.get("color");
-          TextColor formattingColor;
-          
-          if (isFormattingColorCached(nick)) {
-            formattingColor = getFormattingColor(nick);
-          } else {
-            if (colorTag.equals("")) {
-              formattingColor = CalculateMinecraftColor.getDefaultUserColor(nick);
-            } else {
-              Color userColor = Color.decode(colorTag);
-              formattingColor = TextColor.fromRgb(userColor.getRGB());
-            }
-            putFormattingColor(nick, formattingColor);
-          }
-
-          String[] badges = Arrays.stream(Objects.requireNonNull(v3Tags.getOrDefault("badges", "")).split(","))
-                  .map(badge -> badge.split("/")[0])
-                  .toArray(String[]::new);
-
-          String formattedTime = TwitchChatMod.formatTMISentTimestamp(v3Tags.get("tmi-sent-ts"));
-          TwitchChatMod.addTwitchMessage(formattedTime, nick, message, formattingColor, badges, false);
-        }
-      } else {
-        System.out.println("Message with no v3tags: " + event.getMessage());
-      }
-    } else {
-      System.out.println("NON-USER MESSAGE" + event.getMessage());
-    }
+    FormatMessage.formatAndSend(event, false);
   }
 
   public void onConnect(GlobalUserStateEvent event) {
-        // Info about our user. More at https://dev.twitch.tv/docs/irc/commands/#userstate
-        // Set our correct colour :).
-        String colorTag = event.getColor().orElse(null);
-        if (colorTag != null) {
-          Color userColor = Color.decode(colorTag);
-          TextColor formattingColor = TextColor.fromRgb(userColor.getRGB());
+    this.username = event.getDisplayName().orElse(event.getMessageEvent().getUserName());
+    this.userBadges = new ArrayList<>();
+    event.getMessageEvent().getBadges().forEach((name,  version) -> {
+      try {
+        Badge badge = TwitchChatMod.BADGES.get(name);
+        this.userBadges.add(badge);
+      } catch (IllegalArgumentException ignored) {}
+    });
 
-          putFormattingColor(getUsername(), formattingColor);
-        }
+    String colorTag = event.getColor().orElse(null);
+    if (colorTag != null) {
+      Color userColor = Color.decode(colorTag);
+      TextColor formattingColor = TextColor.fromRgb(userColor.getRGB());
+
+      putFormattingColor(getUsername(), formattingColor);
+    }
   }
 
   public void onNotice(ChannelNoticeEvent event) {
@@ -138,36 +108,22 @@ public class Bot {
 
   // Handle /me
   public void onAction(ChannelMessageActionEvent event) {
-    EventUser user = event.getUser();
-
-    if (user != null) {
-      String nick = user.getName();
-
-      if (!ModConfig.getConfig().getIgnoreList().contains(nick.toLowerCase())) {
-        String formattedTime = TwitchChatMod.formatDateTwitch(event.getFiredAt().getTime());
-
-        TextColor formattingColor;
-        if (isFormattingColorCached(nick)) {
-          formattingColor = getFormattingColor(nick);
-        } else {
-          formattingColor = CalculateMinecraftColor.getDefaultUserColor(nick);
-          putFormattingColor(nick, formattingColor);
-        }
-
-        TwitchChatMod.addTwitchMessage(formattedTime, nick, event.getMessage(), formattingColor, new String[]{}, true);
-      }
-    } else {
-      System.out.println("NON-USER ACTION" + event.getMessage());
-    }
+    FormatMessage.formatAndSend(event, true);
   }
 
-  String currentChannel;
-  public void onJoin(ChannelStateEvent event) {
-    String channel = event.getChannel().getName();
-     if (currentChannel == null || !currentChannel.equals(channel)) {
-      TwitchChatMod.addNotification(Text.translatable("text.twitchchat.bot.connected", this.channel));
-      currentChannel = channel;
-    }
+  public void onJoin(UserStateEvent event) {
+    TwitchChatMod.addNotification(Text.translatable("text.twitchchat.bot.connected", event.getChannel().getName()));
+    String ID = getUserID(event.getChannel().getName());
+    if (Objects.equals(this.channelID, ID)) return;
+    this.channelID = ID;
+
+    this.userBadges = new ArrayList<>();
+    event.getMessageEvent().getBadges().forEach((name, version) -> {
+      try {
+        Badge badge = TwitchChatMod.BADGES.get(this.channelID, name);
+        this.userBadges.add(badge);
+      } catch (IllegalArgumentException ignored) {}
+    });
   }
 
   public void sendMessage(String message) {
@@ -176,6 +132,9 @@ public class Bot {
 
   public String getUsername() {
     return username;
+  }
+  public List<Badge> getUserBadges() {
+    return this.userBadges;
   }
 
   public String getUserID() {
@@ -195,8 +154,12 @@ public class Bot {
     formattingColorCache.put(nick.toLowerCase(), color);
   }
   public void putFormattingColor(String nick, String color) {
-    this.putFormattingColor(nick, TextColor.fromRgb(Integer.valueOf(color.replace("#", ""), 16)));
+    this.putFormattingColor(nick, TextColor.fromRgb(Color.decode(color).getRGB()));
   }
+  public void putFormattingColor(String nick) {
+    this.putFormattingColor(nick, CalculateMinecraftColor.getDefaultUserColor(nick));
+  }
+
   public TextColor getFormattingColor(String nick) {
     return formattingColorCache.get(nick.toLowerCase());
   }
@@ -205,20 +168,20 @@ public class Bot {
   }
 
   public void joinChannel(String channel) {
+    if (!this.isConnected()) return;
     String oldChannel = this.channel;
     this.channel = channel.toLowerCase();
-    if (this.isConnected()) {
-      myExecutor.execute(() -> {
-        if (twitchClient.getChat().isChannelJoined(oldChannel)) {
-          twitchClient.getChat().leaveChannel(oldChannel); // Leave the channel
-        }
-        twitchClient.getChat().joinChannel(this.channel); // Join the new channel
 
-        String channelID = getUserID(channel);
-        twitchClient.getHelix().getGlobalChatBadges(this.oauthKey).execute().getBadgeSets().forEach(chatBadgeSet -> TwitchChatMod.BADGES.add(new Badge(chatBadgeSet)));
-        twitchClient.getHelix().getChannelChatBadges(this.oauthKey, channelID).execute().getBadgeSets().forEach(chatBadgeSet -> TwitchChatMod.BADGES.add(channelID, new Badge(chatBadgeSet)));
-        BadgeFont.reload();
-      });
-    }
+    myExecutor.execute(() -> {
+      if (twitchClient.getChat().isChannelJoined(oldChannel)) {
+        twitchClient.getChat().leaveChannel(oldChannel); // Leave the channel
+      }
+      twitchClient.getChat().joinChannel(this.channel); // Join the new channel
+
+      String channelID = getUserID(channel);
+      twitchClient.getHelix().getGlobalChatBadges(this.oauthKey).execute().getBadgeSets().forEach(chatBadgeSet -> TwitchChatMod.BADGES.add(new Badge(chatBadgeSet)));
+      twitchClient.getHelix().getChannelChatBadges(this.oauthKey, channelID).execute().getBadgeSets().forEach(chatBadgeSet -> TwitchChatMod.BADGES.add(channelID, new Badge(chatBadgeSet)));
+      BadgeFont.reload();
+    });
   }
 }
