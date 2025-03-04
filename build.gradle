@@ -44,17 +44,10 @@ dependencies {
     // not required, but we want to see our config screen
 	modImplementation "com.terraformersmc:modmenu:${project.mod_menu_version}"
 
-    // irc
-    implementation "com.github.pircbotx:pircbotx:${project.pircbotx_version}"
-    include "com.github.pircbotx:pircbotx:${project.pircbotx_version}"
+	// Twitch bridge
+	implementation "com.github.twitch4j:twitch4j:${project.twitch4j_version}"
+	include "com.github.twitch4j:twitch4j:${project.twitch4j_version}"
 
-//	 pircbotx needs this 🤷‍
-//	include group: 'org.slf4j', name: 'slf4j-api', version: '1.7.13'
-//	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.13'
-
-	//	Uncomment this to get more log info from pircbotx.
-	//	include group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.13'
-	//	implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.13'
 }
 
 processResources {
