@@ -1,9 +1,12 @@
 package eu.pabl.twitchchat.twitch_integration;
 
+import eu.pabl.twitchchat.badge.Badge;
+import eu.pabl.twitchchat.badge.BadgeFont;
 import eu.pabl.twitchchat.config.ModConfig;
 import java.awt.Color;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
@@ -22,6 +25,7 @@ public class Bot {
   private TwitchClient twitchClient;
   private final TwitchClientBuilder twitchClientBuilder;
   private final String username;
+  private final String oauthKey;
   private String channel;
   private ExecutorService myExecutor;
   private HashMap<String, TextColor> formattingColorCache; // Map of usernames to colors to keep consistency with usernames and colors
@@ -30,6 +34,7 @@ public class Bot {
   public Bot(String username, String oauthKey, String channel) {
     this.channel = channel.toLowerCase();
     this.username = username.toLowerCase();
+    this.oauthKey = oauthKey.replaceFirst("^oauth:", "");
     formattingColorCache = new HashMap<>();
 
     OAuth2Credential credential = new OAuth2Credential("twitch", oauthKey);
@@ -173,6 +178,18 @@ public class Bot {
     return username;
   }
 
+  public String getUserID() {
+    return getUserID(null);
+  }
+  public String getUserID(String username) {
+    if (username == null) username = this.username;
+
+    return twitchClient.getHelix()
+        .getUsers(this.oauthKey, null, List.of(username)).execute()
+        .getUsers().getFirst()
+        .getId();
+  }
+
   public void putFormattingColor(String nick, TextColor color) {
     if (nick == null || nick.equals("") || color == null) return;
     formattingColorCache.put(nick.toLowerCase(), color);
@@ -194,6 +211,11 @@ public class Bot {
       myExecutor.execute(() -> {
         twitchClient.getChat().leaveChannel(oldChannel); // Leave the channel
         twitchClient.getChat().joinChannel(this.channel); // Join the new channel
+
+        String channelID = getUserID(channel);
+        twitchClient.getHelix().getGlobalChatBadges(this.oauthKey).execute().getBadgeSets().forEach(chatBadgeSet -> TwitchChatMod.BADGES.add(new Badge(chatBadgeSet)));
+        twitchClient.getHelix().getChannelChatBadges(this.oauthKey, channelID).execute().getBadgeSets().forEach(chatBadgeSet -> TwitchChatMod.BADGES.add(channelID, new Badge(chatBadgeSet)));
+        BadgeFont.reload();
       });
     }
   }
