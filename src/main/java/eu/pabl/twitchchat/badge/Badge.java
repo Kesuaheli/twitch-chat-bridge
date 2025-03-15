@@ -260,7 +260,14 @@ public class Badge {
 
             String channelID = null;
             try {
-                channelID = matcher.group("channelName");
+                String channelName = matcher.group("channelName");
+                if (channelName != null) {
+                    if (TwitchChatMod.bot == null) {
+                        TwitchChatMod.LOGGER.warn("Couldn't add resource pack override of channel '" + channelName + "' because bot isn't running yet.");
+                        return;
+                    }
+                    channelID = TwitchChatMod.bot.getUserID(channelName);
+                }
             } catch (IllegalArgumentException ignored) {}
 
             NativeImage image;
