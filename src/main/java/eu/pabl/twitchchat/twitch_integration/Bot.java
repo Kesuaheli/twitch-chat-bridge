@@ -209,7 +209,9 @@ public class Bot {
     this.channel = channel.toLowerCase();
     if (this.isConnected()) {
       myExecutor.execute(() -> {
-        twitchClient.getChat().leaveChannel(oldChannel); // Leave the channel
+        if (twitchClient.getChat().isChannelJoined(oldChannel)) {
+          twitchClient.getChat().leaveChannel(oldChannel); // Leave the channel
+        }
         twitchClient.getChat().joinChannel(this.channel); // Join the new channel
 
         String channelID = getUserID(channel);
