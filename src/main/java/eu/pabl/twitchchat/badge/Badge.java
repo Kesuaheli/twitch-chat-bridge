@@ -1,5 +1,7 @@
 package eu.pabl.twitchchat.badge;
 
+import com.github.twitch4j.helix.domain.ChatBadge;
+import com.github.twitch4j.helix.domain.ChatBadgeSet;
 import eu.pabl.twitchchat.TwitchChatMod;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
@@ -15,6 +17,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -38,6 +43,25 @@ public class Badge {
     Badge(String name, NativeImage image) {
         this.name = name;
         this.image = image;
+    }
+
+    public Badge(ChatBadgeSet chatBadgeSet) {
+        this.name = chatBadgeSet.getSetId();
+        ChatBadge lastVersion = chatBadgeSet.getVersions().getLast();
+        this.displayName = Text.literal(lastVersion.getTitle());
+        setDescription(lastVersion.getDescription());
+
+        try {
+            URI imageURI = new URI(lastVersion.getLargeImageUrl());
+            this.image = NativeImage.read(imageURI.toURL().openStream());
+        } catch (URISyntaxException | MalformedURLException e) {
+            TwitchChatMod.LOGGER.error("Couldn't parse " + this.name + " badge url '" + lastVersion.getLargeImageUrl() + "'");
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            TwitchChatMod.LOGGER.error("Couldn't read image data for " + this.name + " badge url '" + lastVersion.getLargeImageUrl() + "'");
+            throw new RuntimeException(e);
+        }
+
     }
 
     /**
@@ -236,7 +260,14 @@ public class Badge {
 
             String channelID = null;
             try {
-                channelID = matcher.group("channelName");
+                String channelName = matcher.group("channelName");
+                if (channelName != null) {
+                    if (TwitchChatMod.bot == null) {
+                        TwitchChatMod.LOGGER.warn("Couldn't add resource pack override of channel '" + channelName + "' because bot isn't running yet.");
+                        return;
+                    }
+                    channelID = TwitchChatMod.bot.getUserID(channelName);
+                }
             } catch (IllegalArgumentException ignored) {}
 
             NativeImage image;

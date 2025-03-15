@@ -43,10 +43,11 @@ public class TwitchChatMod implements ModInitializer {
     MutableText usernameText = Text.literal(username).styled(style -> style.withColor(textColor));
     MutableText badgesText = Text.literal("");
     String channel = ModConfig.getConfig().getChannel();
+    String channelID = bot.getUserID(channel);
     for (String badgeName : badges) {
       Badge badge;
       try {
-        badge = BADGES.get(channel, badgeName);
+        badge = BADGES.get(channelID, badgeName);
       } catch (IllegalArgumentException e) {
         continue;
       }
