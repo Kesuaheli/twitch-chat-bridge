@@ -1,7 +1,8 @@
-package eu.pabl.twitchchat.twitch_integration;
+package de.kesuaheli.twitchchatbridge.twitch_integration;
 
-import eu.pabl.twitchchat.badge.Badge;
-import eu.pabl.twitchchat.badge.BadgeFont;
+import de.kesuaheli.twitchchatbridge.TwitchChatMod;
+import de.kesuaheli.twitchchatbridge.badge.Badge;
+import de.kesuaheli.twitchchatbridge.badge.BadgeFont;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,7 +17,6 @@ import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
 import com.github.twitch4j.chat.events.channel.*;
-import eu.pabl.twitchchat.TwitchChatMod;
 
 public class Bot {
   private TwitchClient twitchClient;

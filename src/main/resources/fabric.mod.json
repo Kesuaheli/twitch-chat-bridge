@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "twitchchat",
+  "id": "twitchchatbridge",
   "version": "${version}",
 
   "name": "Twitch Chat Bridge",
@@ -8,20 +8,20 @@
   "description": "Interconnect Minecraft chat with Twitch chat!",
   "authors": [
     "Kesuaheli",
-    "pblop (pablo@pabl.eu)"
+    "pblop"
   ],
   "contact": {
-    "homepage": "https://github.com/pblop/twitch-chat",
-    "issues": "https://github.com/pblop/twitch-chat/issues",
-    "sources": "https://github.com/pblop/twitch-chat"
+    "homepage": "https://github.com/Kesuaheli",
+    "issues": "https://github.com/Kesuaheli/twitch-chat-bridge/issues",
+    "sources": "https://github.com/Kesuaheli/twitch-chat-bridge"
   },
 
   "license": "MIT",
 
   "environment": "client",
   "entrypoints": {
-    "main": [ "eu.pabl.twitchchat.TwitchChatMod" ],
-    "modmenu": [ "eu.pabl.twitchchat.config.ModMenuCompat" ]
+    "main": [ "de.kesuaheli.twitchchatbridge.TwitchChatMod" ],
+    "modmenu": [ "de.kesuaheli.twitchchatbridge.config.ModMenuCompat" ]
   },
   "mixins": [
     "twitchchat.mixins.json"

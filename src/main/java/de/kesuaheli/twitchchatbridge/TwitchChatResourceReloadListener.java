@@ -1,6 +1,6 @@
-package eu.pabl.twitchchat;
+package de.kesuaheli.twitchchatbridge;
 
-import eu.pabl.twitchchat.badge.Badge;
+import de.kesuaheli.twitchchatbridge.badge.Badge;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.resource.ReloadableResourceManagerImpl;
 import net.minecraft.resource.ResourceManager;

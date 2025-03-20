@@ -1,7 +1,7 @@
-package eu.pabl.twitchchat.commands;
+package de.kesuaheli.twitchchatbridge.commands;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
-import eu.pabl.twitchchat.TwitchChatMod;
+import de.kesuaheli.twitchchatbridge.TwitchChatMod;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.text.Text;

@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "eu.pabl.twitchchat.mixin",
+  "package": "de.kesuaheli.twitchchatbridge.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
   ],

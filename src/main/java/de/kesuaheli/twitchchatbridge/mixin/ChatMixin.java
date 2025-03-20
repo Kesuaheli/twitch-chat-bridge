@@ -1,8 +1,8 @@
-package eu.pabl.twitchchat.mixin;
+package de.kesuaheli.twitchchatbridge.mixin;
 
-import eu.pabl.twitchchat.TwitchChatMod;
-import eu.pabl.twitchchat.config.ModConfig;
-import eu.pabl.twitchchat.twitch_integration.FormatMessage;
+import de.kesuaheli.twitchchatbridge.TwitchChatMod;
+import de.kesuaheli.twitchchatbridge.config.ModConfig;
+import de.kesuaheli.twitchchatbridge.twitch_integration.FormatMessage;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;

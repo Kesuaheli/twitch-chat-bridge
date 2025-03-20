@@ -1,9 +1,9 @@
-package eu.pabl.twitchchat;
+package de.kesuaheli.twitchchatbridge;
 
-import eu.pabl.twitchchat.badge.BadgeSet;
-import eu.pabl.twitchchat.commands.TwitchBaseCommand;
-import eu.pabl.twitchchat.config.ModConfig;
-import eu.pabl.twitchchat.twitch_integration.Bot;
+import de.kesuaheli.twitchchatbridge.badge.BadgeSet;
+import de.kesuaheli.twitchchatbridge.config.ModConfig;
+import de.kesuaheli.twitchchatbridge.commands.TwitchBaseCommand;
+import de.kesuaheli.twitchchatbridge.twitch_integration.Bot;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;

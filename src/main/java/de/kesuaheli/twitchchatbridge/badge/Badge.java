@@ -1,8 +1,8 @@
-package eu.pabl.twitchchat.badge;
+package de.kesuaheli.twitchchatbridge.badge;
 
 import com.github.twitch4j.helix.domain.ChatBadge;
 import com.github.twitch4j.helix.domain.ChatBadgeSet;
-import eu.pabl.twitchchat.TwitchChatMod;
+import de.kesuaheli.twitchchatbridge.TwitchChatMod;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.resource.Resource;

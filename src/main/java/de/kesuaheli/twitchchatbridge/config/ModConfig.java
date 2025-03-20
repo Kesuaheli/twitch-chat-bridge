@@ -1,4 +1,4 @@
-package eu.pabl.twitchchat.config;
+package de.kesuaheli.twitchchatbridge.config;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

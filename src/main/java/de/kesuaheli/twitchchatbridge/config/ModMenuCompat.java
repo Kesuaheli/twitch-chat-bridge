@@ -1,4 +1,4 @@
-package eu.pabl.twitchchat.config;
+package de.kesuaheli.twitchchatbridge.config;
 
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;

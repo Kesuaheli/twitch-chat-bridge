@@ -1,10 +1,9 @@
-package eu.pabl.twitchchat.badge;
+package de.kesuaheli.twitchchatbridge.badge;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import eu.pabl.twitchchat.TwitchChatMod;
+import de.kesuaheli.twitchchatbridge.TwitchChatMod;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import net.minecraft.client.font.*;
-import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;

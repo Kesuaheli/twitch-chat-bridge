@@ -1,9 +1,9 @@
-package eu.pabl.twitchchat.twitch_integration;
+package de.kesuaheli.twitchchatbridge.twitch_integration;
 
 import com.github.twitch4j.chat.events.AbstractChannelMessageEvent;
-import eu.pabl.twitchchat.TwitchChatMod;
-import eu.pabl.twitchchat.badge.Badge;
-import eu.pabl.twitchchat.config.ModConfig;
+import de.kesuaheli.twitchchatbridge.badge.Badge;
+import de.kesuaheli.twitchchatbridge.config.ModConfig;
+import de.kesuaheli.twitchchatbridge.TwitchChatMod;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
