@@ -1,4 +1,4 @@
-package eu.pabl.twitchchat.config;
+package de.kesuaheli.twitchchatbridge.config;
 
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
@@ -66,12 +66,6 @@ public class ModMenuCompat implements ModMenuApi {
               .build());
 
       ConfigCategory credentialsCategory = builder.getOrCreateCategory(Text.translatable("config.twitchchat.category.credentials"));
-      credentialsCategory.addEntry(entryBuilder
-              .startStrField(Text.translatable("config.twitchchat.credentials.username"), ModConfig.getConfig().getUsername())
-              .setSaveConsumer((s -> ModConfig.getConfig().setUsername(s)))
-              .setTooltip(Text.translatable("config.twitchchat.credentials.username.tooltip"))
-              .setDefaultValue(ModConfig.DEFAULT_USERNAME)
-              .build());
       credentialsCategory.addEntry(entryBuilder
               .startStrField(Text.translatable("config.twitchchat.credentials.oauthKey"), ModConfig.getConfig().getOauthKey())
               .setSaveConsumer((s -> ModConfig.getConfig().setOauthKey(s)))

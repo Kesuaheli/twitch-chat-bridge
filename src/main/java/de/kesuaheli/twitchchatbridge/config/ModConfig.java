@@ -1,4 +1,4 @@
-package eu.pabl.twitchchat.config;
+package de.kesuaheli.twitchchatbridge.config;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -18,7 +18,6 @@ import net.fabricmc.loader.api.FabricLoader;
 public class ModConfig {
 
   public static final String DEFAULT_CHANNEL = "";
-  public static final String DEFAULT_USERNAME = "";
   public static final String DEFAULT_OAUTH_KEY = "";
   public static final String DEFAULT_PREFIX = ":";
   public static final String DEFAULT_DATE_FORMAT = "[H:mm] ";
@@ -31,7 +30,6 @@ public class ModConfig {
   private final File configFile;
 
   private String channel;
-  private String username;
   private String oauthKey;
   private String prefix;
   private String dateFormat;
@@ -47,7 +45,6 @@ public class ModConfig {
         .resolve("twitchchat.json")
         .toFile();
     this.channel = DEFAULT_CHANNEL;
-    this.username = DEFAULT_USERNAME;
     this.oauthKey = DEFAULT_OAUTH_KEY;
     this.prefix = DEFAULT_PREFIX;
     this.dateFormat = DEFAULT_DATE_FORMAT;
@@ -73,9 +70,6 @@ public class ModConfig {
         this.channel = jsonObject.has("channel")
                 ? jsonObject.getAsJsonPrimitive("channel").getAsString()
                 : DEFAULT_CHANNEL;
-        this.username = jsonObject.has("username")
-                ? jsonObject.getAsJsonPrimitive("username").getAsString()
-                : DEFAULT_USERNAME;
         this.oauthKey = jsonObject.has("oauthKey")
                 ? jsonObject.getAsJsonPrimitive("oauthKey").getAsString()
                 : DEFAULT_OAUTH_KEY;
@@ -114,7 +108,6 @@ public class ModConfig {
   public void save() {
     JsonObject jsonObject = new JsonObject();
     jsonObject.addProperty("channel", this.channel);
-    jsonObject.addProperty("username", this.username);
     jsonObject.addProperty("oauthKey", this.oauthKey);
     jsonObject.addProperty("prefix", this.prefix);
     jsonObject.addProperty("dateFormat", this.dateFormat);
@@ -129,7 +122,7 @@ public class ModConfig {
     jsonObject.addProperty("broadcast", this.broadcast);
     jsonObject.addProperty("broadcastPrefix", this.broadcastPrefix);
     try (PrintWriter out = new PrintWriter(configFile)) {
-       out.println(jsonObject.toString());
+      out.println(jsonObject.toString());
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
@@ -141,14 +134,6 @@ public class ModConfig {
 
   public void setChannel(String channel) {
     this.channel = channel;
-  }
-
-  public String getUsername() {
-    return username;
-  }
-
-  public void setUsername(String username) {
-    this.username = username;
   }
 
   public String getOauthKey() {

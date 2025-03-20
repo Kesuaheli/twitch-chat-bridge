@@ -1,7 +1,7 @@
-package eu.pabl.twitchchat.mixin;
+package de.kesuaheli.twitchchatbridge.mixin;
 
-import eu.pabl.twitchchat.TwitchChatMod;
-import eu.pabl.twitchchat.badge.BadgeFont;
+import de.kesuaheli.twitchchatbridge.badge.BadgeFont;
+import de.kesuaheli.twitchchatbridge.TwitchChatMod;
 import net.minecraft.client.font.FontManager;
 import net.minecraft.client.font.FontStorage;
 import net.minecraft.client.texture.TextureManager;

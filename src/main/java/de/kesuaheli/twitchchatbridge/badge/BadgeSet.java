@@ -1,4 +1,4 @@
-package eu.pabl.twitchchat.badge;
+package de.kesuaheli.twitchchatbridge.badge;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;

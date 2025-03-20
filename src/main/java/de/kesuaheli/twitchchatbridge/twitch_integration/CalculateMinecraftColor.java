@@ -1,4 +1,4 @@
-package eu.pabl.twitchchat.twitch_integration;
+package de.kesuaheli.twitchchatbridge.twitch_integration;
 
 import net.minecraft.text.TextColor;
 
