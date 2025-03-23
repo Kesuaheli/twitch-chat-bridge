@@ -4,10 +4,11 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
-import de.kesuaheli.twitchchatbridge.config.ModConfig;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.text.Text;
+
+import static de.kesuaheli.twitchchatbridge.TwitchChatMod.CONFIG;
 
 public class TwitchWatchCommand extends LiteralArgumentBuilder<FabricClientCommandSource> {
   TwitchWatchCommand() {
@@ -21,7 +22,7 @@ public class TwitchWatchCommand extends LiteralArgumentBuilder<FabricClientComma
   private int execute(CommandContext<FabricClientCommandSource> ctx) {
     String channelName = StringArgumentType.getString(ctx, "channel_name");
 
-    ModConfig.getConfig().setChannel(channelName);
+    CONFIG.channel(channelName);
     // Also switch channels if the bot has been initialized
     if (TwitchChatMod.bot != null) {
       ctx.getSource().sendFeedback(Text.translatable("text.twitchchat.command.watch.switching", channelName));
@@ -29,7 +30,7 @@ public class TwitchWatchCommand extends LiteralArgumentBuilder<FabricClientComma
     } else {
       ctx.getSource().sendFeedback(Text.translatable("text.twitchchat.command.watch.connect_on_enable", channelName));
     }
-    ModConfig.getConfig().save();
+    CONFIG.save();
     return 1;
   }
 }

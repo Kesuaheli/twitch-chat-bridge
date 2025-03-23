@@ -15,6 +15,7 @@ repositories {
     maven { url = 'https://maven.shedaniel.me/' }
 	maven { url = 'https://maven.terraformersmc.com/'}
 	maven { url 'https://jitpack.io' }
+	maven { url = 'https://maven.wispforest.io/releases/'}
 }
 
 loom {
@@ -43,6 +44,7 @@ dependencies {
 
     // not required, but we want to see our config screen
 	modImplementation "com.terraformersmc:modmenu:${project.mod_menu_version}"
+	annotationProcessor modImplementation("io.wispforest:owo-lib:${project.owo_config_version}")
 
 	// Twitch bridge
 	implementation "com.github.twitch4j:twitch4j:${project.twitch4j_version}"

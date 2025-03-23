@@ -1,29 +1,33 @@
 package de.kesuaheli.twitchchatbridge;
 
 import de.kesuaheli.twitchchatbridge.badge.BadgeSet;
-import de.kesuaheli.twitchchatbridge.config.ModConfig;
 import de.kesuaheli.twitchchatbridge.commands.TwitchBaseCommand;
+import de.kesuaheli.twitchchatbridge.config.ModConfigFile;
+import de.kesuaheli.twitchchatbridge.config.ModConfig;
 import de.kesuaheli.twitchchatbridge.twitch_integration.Bot;
-
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.resource.ResourceType;
-import net.minecraft.text.Text;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TwitchChatMod implements ModInitializer {
   public final static Logger LOGGER = LoggerFactory.getLogger(TwitchChatMod.class);
+  public static ModConfig CONFIG;
   public static Bot bot;
   public static final BadgeSet BADGES = new BadgeSet();
 
   @Override
   public void onInitialize() {
-    ModConfig.getConfig().load();
+    var hasNewConfig= FabricLoader.getInstance().getConfigDir().resolve("twitchchatbridge/config.json5").toFile().exists();
+    TwitchChatMod.CONFIG = ModConfig.createAndLoad();
+    if (!hasNewConfig) ModConfigFile.loadLegacy();
 
     // Register commands
     ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
@@ -36,7 +40,7 @@ public class TwitchChatMod implements ModInitializer {
 
   public static void addTwitchMessage(Text message) {
 
-    if (ModConfig.getConfig().isBroadcastEnabled()) {
+    if (CONFIG.broadcast()) {
       if (MinecraftClient.getInstance().player != null) {
         MinecraftClient.getInstance().player.sendMessage(message, false);
         return;

@@ -20,8 +20,7 @@
 
   "environment": "client",
   "entrypoints": {
-    "main": [ "de.kesuaheli.twitchchatbridge.TwitchChatMod" ],
-    "modmenu": [ "de.kesuaheli.twitchchatbridge.config.ModMenuCompat" ]
+    "main": [ "de.kesuaheli.twitchchatbridge.TwitchChatMod" ]
   },
   "mixins": [
     "twitchchat.mixins.json"

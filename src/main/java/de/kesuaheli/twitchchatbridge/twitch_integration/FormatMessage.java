@@ -1,9 +1,8 @@
 package de.kesuaheli.twitchchatbridge.twitch_integration;
 
 import com.github.twitch4j.chat.events.AbstractChannelMessageEvent;
-import de.kesuaheli.twitchchatbridge.badge.Badge;
-import de.kesuaheli.twitchchatbridge.config.ModConfig;
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
+import de.kesuaheli.twitchchatbridge.badge.Badge;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -14,6 +13,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static de.kesuaheli.twitchchatbridge.TwitchChatMod.CONFIG;
 
 public class FormatMessage {
 
@@ -36,7 +37,7 @@ public class FormatMessage {
 
   public static @Nullable Text formatMessage(AbstractChannelMessageEvent event, boolean isActionMessage) {
     String nick = event.getMessageEvent().getUserDisplayName().orElse(event.getUser().getName());
-    if (ModConfig.getConfig().getIgnoreList().stream().anyMatch(nick::equalsIgnoreCase)) {
+    if (CONFIG.ignoreList().stream().anyMatch(nick::equalsIgnoreCase)) {
       return null;
     }
 
@@ -68,7 +69,7 @@ public class FormatMessage {
 
     MutableText text = Text.literal(formatDateTwitch(time));
 
-    MutableText prefixText = Text.literal(ModConfig.getConfig().getBroadcastPrefix()).styled(style -> style.withColor(Formatting.DARK_PURPLE));
+    MutableText prefixText = Text.literal(CONFIG.prefix()).styled(style -> style.withColor(Formatting.DARK_PURPLE));
     text.append(prefixText);
 
     MutableText usernameText = Text.literal("");
@@ -91,7 +92,7 @@ public class FormatMessage {
   }
 
   public static String formatDateTwitch(Date date) {
-    SimpleDateFormat sf = new SimpleDateFormat(ModConfig.getConfig().getDateFormat());
+    SimpleDateFormat sf = new SimpleDateFormat(CONFIG.dateFormat());
     return sf.format(date);
   }
 }
