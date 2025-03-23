@@ -27,7 +27,7 @@ public class TwitchChatMod implements ModInitializer {
 
     // Register commands
     ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
-        new TwitchBaseCommand().registerCommands(dispatcher));
+      dispatcher.register(new TwitchBaseCommand()));
 
     // Register reload listener
     ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES)

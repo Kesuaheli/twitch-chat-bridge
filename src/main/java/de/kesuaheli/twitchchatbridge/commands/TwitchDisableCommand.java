@@ -1,29 +1,26 @@
 package de.kesuaheli.twitchchatbridge.commands;
 
-import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-public class TwitchDisableCommand implements SubCommand {
-  public ArgumentBuilder<FabricClientCommandSource, ?> getArgumentBuilder() {
-    return ClientCommandManager.literal("disable")
-        // The command to be executed if the command "twitch" is entered with the argument "disable"
-        // It shuts down the irc bot.
-        .executes(ctx -> {
-          if (TwitchChatMod.bot == null || !TwitchChatMod.bot.isConnected()) {
-            ctx.getSource().sendFeedback(Text.translatable("text.twitchchat.command.disable.already_disabled"));
-            return 1;
-          }
+public class TwitchDisableCommand extends LiteralArgumentBuilder<FabricClientCommandSource> {
+  TwitchDisableCommand() {
+    super("disable");
+    executes(this::execute);
+  }
 
-          TwitchChatMod.bot.stop();
-          ctx.getSource().sendFeedback(Text.translatable("text.twitchchat.command.disable.disabled").formatted(
-              Formatting.DARK_GRAY));
+  private int execute(CommandContext<FabricClientCommandSource> ctx) {
+    if (TwitchChatMod.bot == null || !TwitchChatMod.bot.isConnected()) {
+      ctx.getSource().sendFeedback(Text.translatable("text.twitchchat.command.disable.already_disabled"));
+      return 0;
+    }
 
-          // Return a result. -1 is failure, 0 is a pass and 1 is success.
-          return 1;
-        });
+    TwitchChatMod.bot.stop();
+    ctx.getSource().sendFeedback(Text.translatable("text.twitchchat.command.disable.disabled").formatted(Formatting.DARK_GRAY));
+    return 1;
   }
 }
