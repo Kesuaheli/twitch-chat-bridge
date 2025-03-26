@@ -27,6 +27,7 @@ dependencies {
 
 	modImplementation "com.terraformersmc:modmenu:${project.mod_menu_version}"
 	annotationProcessor modImplementation("io.wispforest:owo-lib:${project.owo_config_version}")
+	include("io.wispforest:owo-sentinel:${project.owo_config_version}")
 
 	implementation include("com.github.twitch4j:twitch4j:${project.twitch4j_version}")
 }
