@@ -35,6 +35,6 @@
   },
   "suggests": {
     "modmenu": ">=13.0.0-beta.1",
-    "cloth-config": ">=17.0.142"
+    "owo-lib": ">=0.12.20+1.21.4"
   }
 }
