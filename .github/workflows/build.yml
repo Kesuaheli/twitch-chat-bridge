@@ -1,7 +1,24 @@
 name: Build Twitch Chat
 
 on:
+  workflow_call:
   push:
+    branches:
+      - main
+
+    paths:
+      - .github/workflows/build.yml
+      - gradle/**
+      - src/**
+      - build.gradle
+      - gradle.properties
+      - gradlew
+      - gradlew.bat
+      - settings.gradle
+
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
@@ -28,7 +45,7 @@ jobs:
       - name: Save Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Twitch Chat Bridge
+          name: ${{ vars.MOD_NAME }}
           path: ${{ github.workspace }}/build/libs
 
   dependency-submission:

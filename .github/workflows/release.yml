@@ -1,0 +1,112 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+    paths:
+      - gradle.properties
+
+permissions:
+  contents: write
+
+jobs:
+  check-release:
+    name: Check Release
+    runs-on: ubuntu-latest
+    outputs:
+      TAG_EXISTS: ${{ steps.check-for-existing-tag.outputs.TAG_EXISTS }}
+      MOD_VERSION: ${{ steps.get-version.outputs.MOD_VERSION }}
+      MC_VERSION: ${{ steps.get-version.outputs.MC_VERSION }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get Version
+        id: get-version
+        run: |-
+          echo "MOD_VERSION=$(cat gradle.properties | grep mod_version | cut -d'=' -f2)" >> $GITHUB_OUTPUT
+          echo "MC_VERSION=$(cat gradle.properties | grep minecraft_version | cut -d'=' -f2)" >> $GITHUB_OUTPUT
+
+      - name: Check for existing release
+        id: check-for-existing-tag
+        env:
+          MOD_VERSION: ${{ steps.get-version.outputs.MOD_VERSION }}
+
+        run: |
+          if [ $(git tag -l $MOD_VERSION) ]; then
+            echo "Tag \"$MOD_VERSION\" already exists. Skipping next jobs."
+            echo "TAG_EXISTS=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Tag \"$MOD_VERSION\" does not exist. Running next jobs."
+            echo "TAG_EXISTS=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  run-build:
+    name: Run build.yml
+    needs: check-release
+    if: ${{ needs.check-release.outputs.TAG_EXISTS == 'false' }}
+
+    uses: ./.github/workflows/build.yml
+
+  release:
+    name: Release
+    needs:
+      - check-release
+      - run-build
+    if: ${{ needs.check-release.outputs.TAG_EXISTS == 'false' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ vars.MOD_NAME }}
+          path: build/libs
+
+      - name: Create Tag
+        id: create-tag
+        uses: mathieudutour/github-tag-action@v6.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tag_prefix: ""
+          custom_tag: ${{ needs.check-release.outputs.MOD_VERSION }}
+
+      - name: Get Release Filenames
+        id: get-release-filenames
+        run: |-
+          echo "RELEASE_FILES=$(ls build/libs/*.jar | egrep -v -- '-(dev|sources|javadoc).jar$')" >> $GITHUB_OUTPUT
+          echo "${{ secrets.MODRINTH_TOKEN }}" | wc -mc
+
+      - name: Create a Modrinth release
+        uses: cloudnode-pro/modrinth-publish@v2
+        with:
+          project: ${{ vars.MODRINTH_ID }}
+          token: ${{ secrets.MODRINTH_TOKEN }}
+
+          files: ${{ steps.get-release-filenames.outputs.RELEASE_FILES }}
+          name: ${{ vars.MOD_NAME }} ${{ needs.check-release.outputs.MOD_VERSION }}
+          version: ${{ needs.check-release.outputs.MOD_VERSION }}
+          channel: ${{ startsWith(needs.check-release.outputs.MOD_VERSION, '0.') && 'beta' || 'release' }}
+          loaders: fabric
+          game-versions: ${{ needs.check-release.outputs.MC_VERSION }}
+          dependencies: |-
+            [
+              {
+                "project_id": "P7dR8mSH",
+                "dependency_type": "required"
+              },
+              {
+                "project_id": "ccKDOlHs",
+                "dependency_type": "required"
+              },
+              {
+                "project_id": "mOgUt4GM",
+                "dependency_type": "optional"
+              }
+            ]
