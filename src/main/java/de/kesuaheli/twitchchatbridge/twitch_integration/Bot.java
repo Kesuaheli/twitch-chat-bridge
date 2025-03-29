@@ -1,22 +1,23 @@
 package de.kesuaheli.twitchchatbridge.twitch_integration;
 
+import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
+import com.github.philippheuer.events4j.core.EventManager;
+import com.github.twitch4j.TwitchClient;
+import com.github.twitch4j.TwitchClientBuilder;
+import com.github.twitch4j.chat.events.channel.*;
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
 import de.kesuaheli.twitchchatbridge.badge.Badge;
 import de.kesuaheli.twitchchatbridge.badge.BadgeFont;
-import java.awt.Color;
+import net.minecraft.text.Text;
+import net.minecraft.text.TextColor;
+
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
-import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
-import com.github.philippheuer.events4j.core.EventManager;
-import com.github.twitch4j.TwitchClient;
-import com.github.twitch4j.TwitchClientBuilder;
-import com.github.twitch4j.chat.events.channel.*;
 
 public class Bot {
   private TwitchClient twitchClient;

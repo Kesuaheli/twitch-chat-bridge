@@ -12,6 +12,7 @@ public class TwitchBaseCommand extends LiteralArgumentBuilder<FabricClientComman
     then(new TwitchDisableCommand());
     then(new TwitchWatchCommand());
     then(new TwitchBroadcastCommand());
+    then(new TwitchConfigCommand());
     executes(ctx -> {
       ctx.getSource().sendFeedback(Text.translatable("text.twitchchat.command.base.noargs1"));
       ctx.getSource().sendFeedback(Text.translatable("text.twitchchat.command.base.noargs2"));

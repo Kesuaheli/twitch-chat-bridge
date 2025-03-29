@@ -1,7 +1,6 @@
 package de.kesuaheli.twitchchatbridge.mixin;
 
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
-import de.kesuaheli.twitchchatbridge.config.ModConfig;
 import de.kesuaheli.twitchchatbridge.twitch_integration.FormatMessage;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.text.Text;
@@ -10,16 +9,17 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import static de.kesuaheli.twitchchatbridge.TwitchChatMod.CONFIG;
+
 @Mixin(ChatScreen.class)
 public class ChatMixin {
   @Inject(at = @At("HEAD"), method = "sendMessage", cancellable = true)
   private void sendMessage(String message, boolean addToHistory, CallbackInfo info) {
-    ModConfig config = ModConfig.getConfig();
-    String prefix = config.getPrefix();
+    String prefix = CONFIG.prefix();
 
     // Allow users to write /twitch commands (such as disabling and enabling the mod) when their prefix is "".
     if (!message.startsWith(prefix) ||
-        prefix.equals("") && message.startsWith("/twitch")
+        prefix.equals("") && message.startsWith("/"+ CONFIG.command()+" ")
     ) {
       return;
     }
