@@ -32,11 +32,16 @@ dependencies {
 	implementation include("com.github.twitch4j:twitch4j:${project.twitch4j_version}")
 }
 
+def replaceProperties = [
+		mod_version: mod_version,
+		minecraft_version: minecraft_version,
+]
+
 processResources {
-	inputs.property "version", project.version
+	inputs.properties(replaceProperties)
 
 	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+		expand(replaceProperties)
 	}
 }
 
