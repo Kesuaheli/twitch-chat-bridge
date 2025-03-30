@@ -212,7 +212,7 @@ public class Badge {
         hoverText.append(Text.literal("\ntwitchchat:" + this.name).styled(style -> style
             .withColor(Formatting.DARK_GRAY)
         ));
-        return new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverText);
+        return new HoverEvent.ShowText(hoverText);
     }
 
     /**
