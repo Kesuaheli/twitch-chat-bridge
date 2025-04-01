@@ -132,7 +132,10 @@ public class Badge {
      * @return The display text of the badge.
      */
     public MutableText getDisplayName() {
-        return displayName;
+        if (this.displayName == null) {
+            return Text.empty();
+        }
+        return this.displayName.copy();
     }
 
     /**
@@ -153,7 +156,7 @@ public class Badge {
      * @return Whether the badge has a display name.
      */
     public boolean hasDisplayName() {
-        return this.getDisplayName() != null && !Objects.equals(this.getDisplayName().getLiteralString(), "");
+        return this.displayName != null && !Objects.equals(this.getDisplayName().getLiteralString(), "");
     }
 
     /**
