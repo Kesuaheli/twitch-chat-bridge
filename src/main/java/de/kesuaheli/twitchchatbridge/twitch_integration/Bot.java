@@ -5,17 +5,18 @@ import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
 import com.github.twitch4j.chat.events.channel.*;
+import com.github.twitch4j.helix.domain.User;
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
 import de.kesuaheli.twitchchatbridge.badge.Badge;
 import de.kesuaheli.twitchchatbridge.badge.BadgeFont;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -148,6 +149,17 @@ public class Bot {
         .getUsers(this.oauthKey, null, List.of(username)).execute()
         .getUsers().getFirst()
         .getId();
+  }
+
+  public @Nullable User getUserByID(@NotNull String userID) {
+    try {
+      return twitchClient.getHelix()
+        .getUsers(this.oauthKey, List.of(userID), null).execute()
+        .getUsers().getFirst();
+    } catch (NoSuchElementException e) {
+      TwitchChatMod.LOGGER.warn("Failed to get Twitch user for ID " + userID + ": " + e.getMessage());
+      return null;
+    }
   }
 
   public void putFormattingColor(String nick, TextColor color) {

@@ -1,8 +1,10 @@
 package de.kesuaheli.twitchchatbridge.twitch_integration;
 
 import com.github.twitch4j.chat.events.AbstractChannelMessageEvent;
+import com.github.twitch4j.helix.domain.User;
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
 import de.kesuaheli.twitchchatbridge.badge.Badge;
+import de.kesuaheli.twitchchatbridge.badge.BadgeFont;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -30,7 +32,7 @@ public class FormatMessage {
   }
 
   public static void formatAndSend(Date time, List<Badge> badges, String username, String message, boolean isActionMessage) {
-    Text formattedMessage = formatMessage(time, badges, username, message, isActionMessage);
+    Text formattedMessage = formatMessage(time, Text.empty(), badges, username, message, isActionMessage);
 
     TwitchChatMod.addTwitchMessage(formattedMessage);
   }
@@ -55,6 +57,7 @@ public class FormatMessage {
 
     return formatMessage(
         event.getFiredAt().getTime(),
+        getUserAvatarBadge(event.getSourceChannelId().orElse(null)),
         badges,
         nick,
         event.getMessage(),
@@ -62,7 +65,7 @@ public class FormatMessage {
     );
   }
 
-  public static @NotNull Text formatMessage(Date time, List<Badge> badges, String username, String message, boolean isActionMessage) {
+  public static @NotNull Text formatMessage(Date time, Text avatar, List<Badge> badges, String username, String message, boolean isActionMessage) {
     if (!TwitchChatMod.bot.isFormattingColorCached(username)) {
       TwitchChatMod.bot.putFormattingColor(username);
     }
@@ -71,6 +74,8 @@ public class FormatMessage {
 
     MutableText prefixText = Text.literal(CONFIG.prefix()).styled(style -> style.withColor(Formatting.DARK_PURPLE));
     text.append(prefixText);
+
+    text.append(avatar);
 
     MutableText usernameText = Text.literal("");
     badges.forEach(badge -> usernameText.append(badge.toText()));
@@ -94,5 +99,30 @@ public class FormatMessage {
   public static String formatDateTwitch(Date date) {
     SimpleDateFormat sf = new SimpleDateFormat(CONFIG.dateFormat());
     return sf.format(date);
+  }
+
+  private static @NotNull Text getUserAvatarBadge(@Nullable String userID) {
+    if (userID == null) return Text.empty();
+
+    try {
+      Badge badge = TwitchChatMod.BADGES.getChannelOnly(userID, "");
+      return badge.toText();
+    } catch (IllegalArgumentException ignored) {}
+
+
+    User user = TwitchChatMod.bot.getUserByID(userID);
+    if (user == null) {
+      return Text.empty();
+    }
+
+    TwitchChatMod.BADGES.add(userID, new Badge(user));
+    BadgeFont.reload();
+    TwitchChatMod.LOGGER.info("Added Avatar badge for user " + user.getDisplayName());
+    try {
+      return TwitchChatMod.BADGES.getChannelOnly(userID, "").toText();
+    } catch (IllegalArgumentException e) {
+      TwitchChatMod.LOGGER.error("Newly added Avatar badge for user " + user.getDisplayName() + " not found:" + e);
+      return Text.empty();
+    }
   }
 }

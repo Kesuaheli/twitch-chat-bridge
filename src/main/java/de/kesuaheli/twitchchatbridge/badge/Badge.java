@@ -2,6 +2,7 @@ package de.kesuaheli.twitchchatbridge.badge;
 
 import com.github.twitch4j.helix.domain.ChatBadge;
 import com.github.twitch4j.helix.domain.ChatBadgeSet;
+import com.github.twitch4j.helix.domain.User;
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
@@ -61,7 +62,23 @@ public class Badge {
             TwitchChatMod.LOGGER.error("Couldn't read image data for " + this.name + " badge url '" + lastVersion.getLargeImageUrl() + "'");
             throw new RuntimeException(e);
         }
+    }
 
+    public Badge(User user) {
+        this.name = "";
+        this.displayName = Text.literal(user.getDisplayName());
+        setDescription(user.getDescription());
+
+        try {
+            URI imageURI = new URI(user.getProfileImageUrl());
+            this.image = NativeImage.read(imageURI.toURL().openStream());
+        } catch (URISyntaxException | MalformedURLException e) {
+            TwitchChatMod.LOGGER.error("Couldn't parse " + user.getLogin() + " avatar url '" + user.getProfileImageUrl() + "'");
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            TwitchChatMod.LOGGER.error("Couldn't read image data for " + user.getLogin() + " avatar url '" + user.getProfileImageUrl() + "'");
+            throw new RuntimeException(e);
+        }
     }
 
     /**
