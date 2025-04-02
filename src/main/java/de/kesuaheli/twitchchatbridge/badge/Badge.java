@@ -71,7 +71,10 @@ public class Badge {
 
         try {
             URI imageURI = new URI(user.getProfileImageUrl());
-            this.image = NativeImage.read(imageURI.toURL().openStream());
+            var image = NativeImage.read(imageURI.toURL().openStream());
+            this.image = new NativeImage(69, 69, true);
+            image.resizeSubRectTo(0,0, image.getHeight(), image.getHeight(), this.image);
+            image.close();
         } catch (URISyntaxException | MalformedURLException e) {
             TwitchChatMod.LOGGER.error("Couldn't parse " + user.getLogin() + " avatar url '" + user.getProfileImageUrl() + "'");
             throw new RuntimeException(e);
