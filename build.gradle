@@ -29,7 +29,7 @@ dependencies {
 	annotationProcessor modImplementation("io.wispforest:owo-lib:${project.owo_config_version}")
 	include("io.wispforest:owo-sentinel:${project.owo_config_version}")
 
-	implementation include("com.github.twitch4j:twitch4j:${project.twitch4j_version}")
+	modImplementation("com.github.twitch4j:twitch4j:${project.twitch4j_version}")
 }
 
 Map<String, String> replaceProperties = [
@@ -38,6 +38,7 @@ Map<String, String> replaceProperties = [
 		"loader_version": project.loader_version,
 
 		"owo_config_version": project.owo_config_version,
+		"twitch4j_version": project.twitch4j_version,
 		"modmenu_version": project.modmenu_version,
 ]
 

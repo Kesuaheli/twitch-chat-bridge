@@ -106,6 +106,10 @@ jobs:
                 "dependency_type": "required"
               },
               {
+                "project_id": "CmHD69Pj",
+                "dependency_type": "required"
+              },
+              {
                 "project_id": "mOgUt4GM",
                 "dependency_type": "optional"
               }
