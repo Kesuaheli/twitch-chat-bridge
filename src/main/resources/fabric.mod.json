@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "twitchchatbridge",
-  "version": "${version}",
+  "version": "${mod_version}",
 
   "name": "Twitch Chat Bridge",
   "icon": "assets/twitchchat/icon.png",
@@ -28,13 +28,13 @@
   "accessWidener": "twitchchat.accesswidener",
 
   "depends": {
-    "minecraft": "1.21.4",
-    "fabricloader": ">=0.16.9",
-    "fabric": ">=0.111.0+1.21.4",
+    "minecraft": "${minecraft_version}",
+    "fabricloader": "${loader_version}",
+    "fabric": "*",
     "java": ">=21"
   },
   "suggests": {
-    "modmenu": ">=13.0.0-beta.1",
-    "owo-lib": ">=0.12.20+1.21.4"
+    "modmenu": ">=${modmenu_version}",
+    "owo-lib": ">=${owo_config_version}"
   }
 }

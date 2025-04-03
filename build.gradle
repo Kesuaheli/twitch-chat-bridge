@@ -25,18 +25,28 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	modImplementation "com.terraformersmc:modmenu:${project.mod_menu_version}"
+	modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
 	annotationProcessor modImplementation("io.wispforest:owo-lib:${project.owo_config_version}")
 	include("io.wispforest:owo-sentinel:${project.owo_config_version}")
 
 	implementation include("com.github.twitch4j:twitch4j:${project.twitch4j_version}")
 }
 
+Map<String, String> replaceProperties = [
+		"mod_version": project.mod_version,
+		"minecraft_version": project.minecraft_version,
+		"loader_version": project.loader_version,
+
+		"owo_config_version": project.owo_config_version,
+		"modmenu_version": project.modmenu_version,
+]
+
 processResources {
-	inputs.property "version", project.version
+	inputs.properties(replaceProperties)
+	filteringCharset "UTF-8"
 
 	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+		expand(replaceProperties)
 	}
 }
 
