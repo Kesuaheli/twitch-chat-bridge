@@ -1,12 +1,15 @@
 # Twitch Chat Bridge
 
+[![Build Twitch Chat](https://github.com/Kesuaheli/twitch-chat-bridge/actions/workflows/build.yml/badge.svg)](https://github.com/Kesuaheli/twitch-chat-bridge/actions/workflows/build.yml)
+[![Release](https://github.com/Kesuaheli/twitch-chat-bridge/actions/workflows/release.yml/badge.svg)](https://modrinth.com/mod/twitch-chat-bridge)
+
 A Fabric mod that allows you to connect your Minecraft chat to a Twitch chat and vise versa.
 
 Chat messages from your selected Twitch channel get displayed in your Minecraft chat. Usernames in the MC chat are colored in the users selected color. Also all badges of the user are displayed before their username.
 
 ## Download
 
-Download on [Modrinth](https://modrinth.com/mod/twitch-chat-bridge).
+[![Download on Modrinth](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.modrinth.com%2Fv2%2Fproject%2FuhFB00mS&query=downloads&logo=modrinth&label=Download%20on%20Modrinth&labelColor=1B1E2B&suffix=%20downloads&color=1BD96A)](https://modrinth.com/mod/twitch-chat-bridge)
 
 ## Usage
 
