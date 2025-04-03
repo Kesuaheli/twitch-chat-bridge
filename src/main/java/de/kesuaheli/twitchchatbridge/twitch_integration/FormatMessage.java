@@ -76,6 +76,7 @@ public class FormatMessage {
     badges.forEach(badge -> usernameText.append(badge.toText()));
     usernameText.append(Text.literal(username).styled(style -> style.withColor(TwitchChatMod.bot.getFormattingColor(username))));
 
+    message = sanitiseMessage(message);
     if (isActionMessage) {
       Text messageText = Text.literal(message).styled(style -> style.withColor(TwitchChatMod.bot.getFormattingColor(username)));
       text.append(Text.translatable("chat.type.emote", usernameText, messageText));
@@ -88,7 +89,10 @@ public class FormatMessage {
   }
 
   private static String sanitiseMessage(String message) {
-    return message.replaceAll("§", "");
+    return message
+      .replaceAll("§", "")
+      .replaceAll("\uFFA0", "")
+      .trim();
   }
 
   public static String formatDateTwitch(Date date) {
