@@ -38,6 +38,8 @@ public class ModConfigFile {
   public List<String> ignoreList = new ArrayList<>();
   @Comment("Whether to use tab completion for the \"/twitch watch <channel>\" command")
   public boolean twitchWatchSuggestions = false;
+  @Comment("Whether to always show the channels user avatar as badge")
+  public boolean avatarBadge = false;
 
   @SectionHeader("credentials")
 

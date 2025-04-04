@@ -57,7 +57,7 @@ public class FormatMessage {
 
     return formatMessage(
         event.getFiredAt().getTime(),
-        getUserAvatarBadge(event.getSourceChannelId().orElse(null)),
+        getUserAvatarBadge(event.getSourceChannelId().orElse(CONFIG.avatarBadge() ? event.getMessageEvent().getChannelId() : null)),
         badges,
         nick,
         event.getMessage(),
