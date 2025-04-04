@@ -9,6 +9,7 @@ import net.minecraft.client.texture.NativeImage;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceFinder;
 import net.minecraft.resource.ResourceManager;
+import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -65,7 +66,7 @@ public class Badge {
     }
 
     public Badge(User user) {
-        this.name = "";
+        this.name = "@"+user.getLogin();
         this.displayName = Text.literal(user.getDisplayName());
         setDescription(user.getDescription());
 
@@ -239,9 +240,15 @@ public class Badge {
      * @return The ready to use text component of the badge.
      */
     public Text toText() {
+        ClickEvent clickEvent = null;
+        if (this.name.startsWith("@")) {
+            clickEvent = new ClickEvent(ClickEvent.Action.OPEN_URL, "https://twitch.tv/" + this.name.substring(1));
+        }
+        final var finalClickEvent = clickEvent;
         return Text.literal(this.getChar()).styled(style -> style
             .withFont(BadgeFont.IDENTIFIER)
             .withHoverEvent(this.getHoverEvent())
+            .withClickEvent(finalClickEvent)
         );
     }
 

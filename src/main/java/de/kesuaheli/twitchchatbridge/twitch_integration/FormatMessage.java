@@ -104,25 +104,20 @@ public class FormatMessage {
   private static @NotNull Text getUserAvatarBadge(@Nullable String userID) {
     if (userID == null) return Text.empty();
 
-    try {
-      Badge badge = TwitchChatMod.BADGES.getChannelOnly(userID, "");
-      return badge.toText();
-    } catch (IllegalArgumentException ignored) {}
-
-
     User user = TwitchChatMod.bot.getUserByID(userID);
     if (user == null) {
       return Text.empty();
     }
 
-    TwitchChatMod.BADGES.add(userID, new Badge(user));
-    BadgeFont.reload();
-    TwitchChatMod.LOGGER.info("Added Avatar badge for user " + user.getDisplayName());
+    Badge badge;
     try {
-      return TwitchChatMod.BADGES.getChannelOnly(userID, "").toText();
+      badge = TwitchChatMod.BADGES.get("@" + user.getLogin());
     } catch (IllegalArgumentException e) {
-      TwitchChatMod.LOGGER.error("Newly added Avatar badge for user " + user.getDisplayName() + " not found:" + e);
-      return Text.empty();
+      badge = new Badge(user);
+      TwitchChatMod.BADGES.add(badge);
+      BadgeFont.reload();
+      TwitchChatMod.LOGGER.info("Added Avatar badge for user {} ({})", user.getDisplayName(), user.getLogin());
     }
+    return badge.toText();
   }
 }
