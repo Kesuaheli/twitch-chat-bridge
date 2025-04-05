@@ -13,6 +13,7 @@ base {
 repositories {
 	maven { url = 'https://maven.terraformersmc.com/'}
 	maven { url = 'https://maven.wispforest.io/releases/'}
+	maven { url = "https://maven.awakenedredstone.com"}
 }
 
 loom {
@@ -29,7 +30,7 @@ dependencies {
 	annotationProcessor modImplementation("io.wispforest:owo-lib:${project.owo_config_version}")
 	include("io.wispforest:owo-sentinel:${project.owo_config_version}")
 
-	modImplementation("com.github.twitch4j:twitch4j:${project.twitch4j_version}")
+	modImplementation("com.github.twitch4j:twitch4j-fabric:${project.twitch4j_version}")
 }
 
 Map<String, String> replaceProperties = [
