@@ -2,12 +2,14 @@ package de.kesuaheli.twitchchatbridge.badge;
 
 import com.github.twitch4j.helix.domain.ChatBadge;
 import com.github.twitch4j.helix.domain.ChatBadgeSet;
+import com.github.twitch4j.helix.domain.User;
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceFinder;
 import net.minecraft.resource.ResourceManager;
+import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -61,7 +63,26 @@ public class Badge {
             TwitchChatMod.LOGGER.error("Couldn't read image data for " + this.name + " badge url '" + lastVersion.getLargeImageUrl() + "'");
             throw new RuntimeException(e);
         }
+    }
 
+    public Badge(User user) {
+        this.name = "@"+user.getLogin();
+        this.displayName = Text.literal(user.getDisplayName());
+        setDescription(user.getDescription());
+
+        try {
+            URI imageURI = new URI(user.getProfileImageUrl());
+            var image = NativeImage.read(imageURI.toURL().openStream());
+            this.image = new NativeImage(69, 69, true);
+            image.resizeSubRectTo(0,0, image.getHeight(), image.getHeight(), this.image);
+            image.close();
+        } catch (URISyntaxException | MalformedURLException e) {
+            TwitchChatMod.LOGGER.error("Couldn't parse " + user.getLogin() + " avatar url '" + user.getProfileImageUrl() + "'");
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            TwitchChatMod.LOGGER.error("Couldn't read image data for " + user.getLogin() + " avatar url '" + user.getProfileImageUrl() + "'");
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -219,9 +240,15 @@ public class Badge {
      * @return The ready to use text component of the badge.
      */
     public Text toText() {
+        ClickEvent clickEvent = null;
+        if (this.name.startsWith("@")) {
+            clickEvent = new ClickEvent(ClickEvent.Action.OPEN_URL, "https://twitch.tv/" + this.name.substring(1));
+        }
+        final var finalClickEvent = clickEvent;
         return Text.literal(this.getChar()).styled(style -> style
             .withFont(BadgeFont.IDENTIFIER)
             .withHoverEvent(this.getHoverEvent())
+            .withClickEvent(finalClickEvent)
         );
     }
 

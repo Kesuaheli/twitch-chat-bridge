@@ -70,10 +70,10 @@ public class BadgeSet {
    * @return The badge for the name.
    * @throws IllegalArgumentException If the given name is neither a channel badge nor a global badges.
    */
-  public Badge.ChannelOverride getChannelOnly(String channelID, String name) {
+  public Badge getChannelOnly(String channelID, String name) {
     Badge.ChannelOverride override = get(name).getChannelOverride(channelID);
     if (override == null) throw new IllegalArgumentException("badge named '" + name + "' does not exist for channel '" + channelID + "'");
-    return override;
+    return override.toBadge();
   }
 
   /**

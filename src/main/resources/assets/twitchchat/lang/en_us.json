@@ -15,6 +15,8 @@
   "text.config.twitchchatbridge/config.option.ignoreList.tooltip": "Messages from users in this list won't be displayed",
   "text.config.twitchchatbridge/config.option.twitchWatchSuggestions": "Suggestions for /twitch watch",
   "text.config.twitchchatbridge/config.option.twitchWatchSuggestions.tooltip": "Autocomplete /twitch watch channel names with names from users in your server",
+  "text.config.twitchchatbridge/config.option.avatarBadge": "Always show channel avatar badge",
+  "text.config.twitchchatbridge/config.option.avatarBadge.tooltip": "Always shows the user avatar of the channel the message was posted in.\nWhen disabled, its only shown when the channel is in shared-chat mode.",
   "text.config.twitchchatbridge/config.section.credentials": "Credentials",
   "text.config.twitchchatbridge/config.category.credentials": "OAuth Token",
   "text.config.twitchchatbridge/config.category.credentials.tooltip": "Your Twitch OAuth token",

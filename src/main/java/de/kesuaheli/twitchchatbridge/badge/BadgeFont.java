@@ -29,12 +29,15 @@ public class BadgeFont implements Font {
             return Font.super.getGlyph(codePoint);
         }
 
-        float scaleFactor = (float) BADGE_SIZE / badge.image().getWidth();
+        var image = badge.image();
+        int width = image.getWidth();
+        int height = image.getHeight();
+        float scaleFactor = (float) BADGE_SIZE / width;
         return new BitmapFont.BitmapFontGlyph(
             scaleFactor,
-            badge.image(),
+            image,
             0, 0,
-            badge.image().getWidth(), badge.image().getHeight(),
+            width, height,
             BADGE_SIZE+1,
             BADGE_SIZE);
     }
