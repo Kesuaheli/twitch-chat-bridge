@@ -32,7 +32,7 @@ public class FormatMessage {
   }
 
   public static void formatAndSend(Date time, List<Badge> badges, String username, String message, boolean isActionMessage) {
-    Text formattedMessage = formatMessage(time, Text.empty(), badges, username, message, isActionMessage);
+    Text formattedMessage = formatMessage(time, getUserAvatarBadge(CONFIG.avatarBadge() ? TwitchChatMod.bot.getChannelID() : null), badges, username, message, isActionMessage);
 
     TwitchChatMod.addTwitchMessage(formattedMessage);
   }
@@ -106,7 +106,7 @@ public class FormatMessage {
   }
 
   private static @NotNull Text getUserAvatarBadge(@Nullable String userID) {
-    if (userID == null) return Text.empty();
+    if (userID == null || userID.equals("")) return Text.empty();
 
     User user = TwitchChatMod.bot.getUserByID(userID);
     if (user == null) {

@@ -25,6 +25,7 @@ public class Bot {
   private final TwitchClientBuilder twitchClientBuilder;
   private String username;
   private List<Badge> userBadges;
+  private Map<String, String> pendingBadges;
   private final String oauthKey;
   private String channel;
   private String channelID;
@@ -58,7 +59,8 @@ public class Bot {
       eventManager.onEvent(ChannelNoticeEvent.class, this::onNotice);
       eventManager.onEvent(ChannelLeaveEvent.class, this::onDisconnect);
       eventManager.onEvent(ChannelMessageActionEvent.class, this::onAction);
-      eventManager.onEvent(UserStateEvent.class, this::onJoin);
+      eventManager.onEvent(UserStateEvent.class, this::onUserstate);
+      eventManager.onEvent(ChannelJoinEvent.class, this::onChannelJoin);
 
       if (!Objects.equals(this.channel, "")) {
         joinChannel(channel);
@@ -113,19 +115,21 @@ public class Bot {
     FormatMessage.formatAndSend(event, true);
   }
 
-  public void onJoin(UserStateEvent event) {
+  public void onUserstate(UserStateEvent event) {
+    this.pendingBadges = event.getMessageEvent().getBadges();
+  }
+
+  public void onChannelJoin(ChannelJoinEvent event) {
+    if (event.getUser().getName().equalsIgnoreCase(this.username)) {
+      this.onChannelJoinMe(event);
+    }
+  }
+
+  private void onChannelJoinMe(ChannelJoinEvent event) {
     String ID = getUserID(event.getChannel().getName());
     if (Objects.equals(this.channelID, ID)) return;
     this.channelID = ID;
     TwitchChatMod.addNotification(Text.translatable("text.twitchchat.bot.connected", event.getChannel().getName()));
-
-    this.userBadges = new ArrayList<>();
-    event.getMessageEvent().getBadges().forEach((name, version) -> {
-      try {
-        Badge badge = TwitchChatMod.BADGES.get(this.channelID, name);
-        this.userBadges.add(badge);
-      } catch (IllegalArgumentException ignored) {}
-    });
   }
 
   public void sendMessage(String message) {
@@ -137,6 +141,10 @@ public class Bot {
   }
   public List<Badge> getUserBadges() {
     return this.userBadges;
+  }
+
+  public String getChannelID() {
+    return this.channelID;
   }
 
   public String getUserID() {
@@ -195,6 +203,21 @@ public class Bot {
       twitchClient.getHelix().getGlobalChatBadges(this.oauthKey).execute().getBadgeSets().forEach(chatBadgeSet -> TwitchChatMod.BADGES.add(new Badge(chatBadgeSet)));
       twitchClient.getHelix().getChannelChatBadges(this.oauthKey, channelID).execute().getBadgeSets().forEach(chatBadgeSet -> TwitchChatMod.BADGES.add(channelID, new Badge(chatBadgeSet)));
       BadgeFont.reload();
+
+      handlePendingBadges();
     });
+  }
+
+  private void handlePendingBadges() {
+    if (this.pendingBadges == null ) return;
+
+    this.userBadges = new ArrayList<>();
+    this.pendingBadges.forEach((name, version) -> {
+      try {
+        Badge badge = TwitchChatMod.BADGES.get(this.channelID, name);
+        this.userBadges.add(badge);
+      } catch (IllegalArgumentException ignored) {}
+    });
+    this.pendingBadges = null;
   }
 }
