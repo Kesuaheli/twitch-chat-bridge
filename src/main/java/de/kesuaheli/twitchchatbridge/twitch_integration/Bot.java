@@ -114,10 +114,10 @@ public class Bot {
   }
 
   public void onJoin(UserStateEvent event) {
-    TwitchChatMod.addNotification(Text.translatable("text.twitchchat.bot.connected", event.getChannel().getName()));
     String ID = getUserID(event.getChannel().getName());
     if (Objects.equals(this.channelID, ID)) return;
     this.channelID = ID;
+    TwitchChatMod.addNotification(Text.translatable("text.twitchchat.bot.connected", event.getChannel().getName()));
 
     this.userBadges = new ArrayList<>();
     event.getMessageEvent().getBadges().forEach((name, version) -> {
