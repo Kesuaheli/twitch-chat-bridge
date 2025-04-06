@@ -21,6 +21,9 @@ public class ModConfigFile {
   @Comment("The channel name currently joined")
   @RegexConstraint("^\\w{4,25}|$")
   public String channel = "";
+  @Comment("The chat prefix to send a message to twitch")
+  @PredicateConstraint("prefixConstraintFunction")
+  public String prefix = ":";
   @Comment("Whether the Twitch chat should be broadcast to the entire server")
   public boolean broadcast = false;
   @Comment("The name to use for the command (Default \"twitch\" means \"/twitch\")")
@@ -31,7 +34,7 @@ public class ModConfigFile {
   @SectionHeader("cosmetics")
 
   @Comment("The prefix to write before Twitch chat messages")
-  public String prefix = "[Twitch] ";
+  public String broadcastPrefix = "[Twitch] ";
   @Comment("How a Twitch chat messages timestamp should be formatted (Default \"[H:mm]\")")
   public String dateFormat = "[H:mm]";
   @Comment("A list of username to ignore messages form i.e. their messages don't show up in-game")
@@ -56,6 +59,10 @@ public class ModConfigFile {
     public String oauthKey = "";
   }
 
+  public static boolean prefixConstraintFunction(String prefix) {
+    return CONFIG == null || !prefix.startsWith("/"+CONFIG.command());
+  }
+
   /**
    * Tries to load config options from the old config file and sets them in the new config object.
    * <p>
@@ -78,6 +85,9 @@ public class ModConfigFile {
     if (legacyConfig.has("channel")) {
       CONFIG.channel(legacyConfig.getAsJsonPrimitive("channel").getAsString());
     }
+    if (legacyConfig.has("prefix")) {
+      CONFIG.prefix(legacyConfig.getAsJsonPrimitive("prefix").getAsString());
+    }
     if (legacyConfig.has("oauthKey")) {
       CONFIG.credentials.oauthKey(legacyConfig.getAsJsonPrimitive("oauthKey").getAsString());
     }
@@ -99,7 +109,7 @@ public class ModConfigFile {
       CONFIG.broadcast (legacyConfig.getAsJsonPrimitive("broadcast").getAsBoolean());
     }
     if (legacyConfig.has("broadcastPrefix")) {
-      CONFIG.prefix(legacyConfig.getAsJsonPrimitive("broadcastPrefix").getAsString());
+      CONFIG.broadcastPrefix(legacyConfig.getAsJsonPrimitive("broadcastPrefix").getAsString());
     }
 
     CONFIG.save();

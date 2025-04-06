@@ -9,6 +9,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.regex.Pattern;
+
 import static de.kesuaheli.twitchchatbridge.TwitchChatMod.CONFIG;
 
 @Mixin(ChatScreen.class)
@@ -31,7 +33,7 @@ public class ChatMixin {
       TwitchChatMod.addNotification(Text.translatable("text.twitchchat.chat.integration_disabled"));
       return;
     }
-    message = message.replaceFirst("^"+prefix, "");
+    message = message.replaceFirst("^"+Pattern.quote(prefix), "");
 
     TwitchChatMod.bot.sendMessage(message); // Send the message to the Twitch IRC Chat
 

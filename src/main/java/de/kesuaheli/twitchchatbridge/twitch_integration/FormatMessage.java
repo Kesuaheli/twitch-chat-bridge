@@ -72,7 +72,7 @@ public class FormatMessage {
 
     MutableText text = Text.literal(formatDateTwitch(time));
 
-    MutableText prefixText = Text.literal(CONFIG.prefix()).styled(style -> style.withColor(Formatting.DARK_PURPLE));
+    MutableText prefixText = Text.literal(CONFIG.broadcastPrefix()).styled(style -> style.withColor(Formatting.DARK_PURPLE));
     text.append(prefixText);
 
     text.append(avatar);
