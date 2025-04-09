@@ -2,6 +2,8 @@
   "text.config.twitchchatbridge/config.title": "Twitch Chat Bridge",
   "text.config.twitchchatbridge/config.title.tooltip": "That's how the mod is called, duh! Now stop hovering me and go set up your config!",
   "text.config.twitchchatbridge/config.option.channel": "Twitch channel",
+  "text.config.twitchchatbridge/config.option.autoConnect": "Auto Connect on start",
+  "text.config.twitchchatbridge/config.option.autoConnect.tooltip": "Whether to automatically enable the connection to twitch when Minecraft starts.",
   "text.config.twitchchatbridge/config.option.prefix": "Prefix",
   "text.config.twitchchatbridge/config.option.prefix.tooltip": "Put this at the start of your messages to send them to a Twitch channel",
   "text.config.twitchchatbridge/config.option.broadcast": "Broadcast Twitch messages",

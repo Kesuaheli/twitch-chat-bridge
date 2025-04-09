@@ -21,6 +21,8 @@ public class ModConfigFile {
   @Comment("The channel name currently joined")
   @RegexConstraint("^\\w{4,25}|$")
   public String channel = "";
+  @Comment("Whether to automatically enable the connection to twitch when Minecraft starts")
+  public boolean autoConnect = true;
   @Comment("The chat prefix to send a message to twitch")
   @PredicateConstraint("prefixConstraintFunction")
   public String prefix = ":";

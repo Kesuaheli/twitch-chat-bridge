@@ -7,6 +7,7 @@ import de.kesuaheli.twitchchatbridge.config.ModConfig;
 import de.kesuaheli.twitchchatbridge.twitch_integration.Bot;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
@@ -36,9 +37,27 @@ public class TwitchChatMod implements ModInitializer {
     // Register reload listener
     ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES)
         .registerReloadListener(new TwitchChatResourceReloadListener());
+
+    if (CONFIG.autoConnect()) {
+      autoConnect();
+    }
+  }
+
+  private static void autoConnect() {
+    if (CONFIG.channel().equals("") || CONFIG.credentials.oauthKey().equals("")) {
+      LOGGER.info("Auto-Connect enabled, but no channel or oauth key set. Please set up your config and enable the bot manually by running \"/{} enable\".", CONFIG.command());
+      return;
+    }
+
+    LOGGER.info("Auto-Connect enabled. Starting bot...");
+    bot = new Bot(CONFIG.credentials.oauthKey(), CONFIG.channel());
+    bot.start();
   }
 
   public static void addTwitchMessage(Text message) {
+    if (MinecraftClient.getInstance().getServer() == null) {
+      return;
+    }
 
     if (CONFIG.broadcast()) {
       if (MinecraftClient.getInstance().player != null) {
