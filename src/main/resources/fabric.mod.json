@@ -29,7 +29,7 @@
 
   "depends": {
     "minecraft": "${minecraft_version}",
-    "fabricloader": "${loader_version}",
+    "fabricloader": ">=${loader_version}",
     "fabric": "*",
     "owo-lib": ">=${owo_config_version}",
     "twitch4j": ">=${twitch4j_version}",
