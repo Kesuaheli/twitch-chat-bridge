@@ -212,7 +212,7 @@ public class Badge {
         hoverText.append(Text.literal("\ntwitchchat:" + this.name).styled(style -> style
             .withColor(Formatting.DARK_GRAY)
         ));
-        return new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverText);
+        return new HoverEvent.ShowText(hoverText);
     }
 
     /**
@@ -242,7 +242,12 @@ public class Badge {
     public Text toText() {
         ClickEvent clickEvent = null;
         if (this.name.startsWith("@")) {
-            clickEvent = new ClickEvent(ClickEvent.Action.OPEN_URL, "https://twitch.tv/" + this.name.substring(1));
+            try {
+                var uri = new URI("https://twitch.tv/" + this.name.substring(1));
+                clickEvent = new ClickEvent.OpenUrl(uri);
+            } catch (URISyntaxException e) {
+                TwitchChatMod.LOGGER.error("Failed to create URI for badge click event: {}", e.getMessage());
+            }
         }
         final var finalClickEvent = clickEvent;
         return Text.literal(this.getChar()).styled(style -> style

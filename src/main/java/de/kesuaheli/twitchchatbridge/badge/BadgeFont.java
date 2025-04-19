@@ -3,6 +3,7 @@ package de.kesuaheli.twitchchatbridge.badge;
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
 import it.unimi.dsi.fastutil.ints.IntSet;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.*;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.util.Identifier;
@@ -58,7 +59,7 @@ public class BadgeFont implements Font {
         if (RenderSystem.isOnRenderThread()) {
             reloadFontStorage();
         } else {
-            RenderSystem.recordRenderCall(BadgeFont::reloadFontStorage);
+            MinecraftClient.getInstance().executeSync(BadgeFont::reloadFontStorage);
         }
     }
     private static void reloadFontStorage() {
