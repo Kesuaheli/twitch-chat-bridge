@@ -55,7 +55,7 @@ public class TwitchChatMod implements ModInitializer {
   }
 
   public static void addTwitchMessage(Text message) {
-    if (MinecraftClient.getInstance().getServer() == null) {
+    if (MinecraftClient.getInstance().player == null) {
       return;
     }
 
