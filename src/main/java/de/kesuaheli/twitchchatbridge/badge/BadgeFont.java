@@ -63,6 +63,9 @@ public class BadgeFont implements Font {
         }
     }
     private static void reloadFontStorage() {
+        if (BadgeFont.fontStorage == null) {
+            newFontStorage(MinecraftClient.getInstance().getTextureManager());
+        }
         BadgeFont.fontStorage.setFonts(BadgeFont.FONT_FILTERS, null);
     }
 }

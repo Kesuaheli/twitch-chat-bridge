@@ -69,6 +69,10 @@ public class TwitchChatMod implements ModInitializer {
   }
 
   public static void addNotification(MutableText message) {
+    if (MinecraftClient.getInstance().player == null) {
+      return;
+    }
+
     MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(message.formatted(Formatting.DARK_GRAY));
   }
 }
