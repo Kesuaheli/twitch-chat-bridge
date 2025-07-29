@@ -45,7 +45,7 @@ jobs:
       - name: Save Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ vars.MOD_NAME }}
+          name: ${{ vars.MOD_NAME || 'TwitchChat' }}
           path: ${{ github.workspace }}/build/libs
 
   dependency-submission:
