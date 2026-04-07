@@ -3,7 +3,6 @@ package de.kesuaheli.twitchchatbridge;
 import de.kesuaheli.twitchchatbridge.badge.Badge;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.resource.ReloadableResourceManagerImpl;
-import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
 import java.util.List;
@@ -39,16 +38,16 @@ public class TwitchChatResourceReloadListener implements IdentifiableResourceRel
    * CompletableFuture.thenAcceptAsync(..., applyExecutor)} for apply actions.
    * In the end, returns the result of {@code thenAcceptAsync}.
    *
-   * @param synchronizer    the synchronizer
-   * @param manager         the resource manager
+   * @param store           the resource store
    * @param prepareExecutor the prepare executor
+   * @param synchronizer    the synchronizer
    * @param applyExecutor   the apply executor
    * @return a future for the reload
    * @see ReloadableResourceManagerImpl#reload(Executor, Executor,
    * CompletableFuture, List)
    */
   @Override
-  public CompletableFuture<Void> reload(Synchronizer synchronizer, ResourceManager manager, Executor prepareExecutor, Executor applyExecutor) {
+  public CompletableFuture<Void> reload(Store store, Executor prepareExecutor, Synchronizer synchronizer, Executor applyExecutor) {
 
     CompletableFuture<Void> preparedAction = CompletableFuture.supplyAsync(() -> {
       TwitchChatMod.BADGES.clearResourcePackOverrides();
