@@ -2,7 +2,7 @@ package de.kesuaheli.twitchchatbridge.commands;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.StringRepresentable;
@@ -16,7 +16,7 @@ public class TwitchConfigCommand extends LiteralArgumentBuilder<FabricClientComm
   TwitchConfigCommand() {
     super("config");
     executes(this::executeHelp);
-    then(ClientCommandManager.argument("option", new EnumArgumentHelper<>(ConfigOption.values()))
+    then(ClientCommands.argument("option", new EnumArgumentHelper<>(ConfigOption.values()))
       .executes(ctx -> ctx.getArgument("option", ConfigOption.class).execute(ctx))
     );
   }
