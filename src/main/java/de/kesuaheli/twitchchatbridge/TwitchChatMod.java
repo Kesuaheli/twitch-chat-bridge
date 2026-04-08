@@ -5,9 +5,10 @@ import de.kesuaheli.twitchchatbridge.commands.TwitchBaseCommand;
 import de.kesuaheli.twitchchatbridge.config.ModConfigFile;
 import de.kesuaheli.twitchchatbridge.config.ModConfig;
 import de.kesuaheli.twitchchatbridge.twitch_integration.Bot;
+import de.kesuaheli.twitchchatbridge.util.Constants;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -34,8 +35,8 @@ public class TwitchChatMod implements ModInitializer {
       dispatcher.register(new TwitchBaseCommand()));
 
     // Register reload listener
-    ResourceManagerHelper.get(PackType.CLIENT_RESOURCES)
-        .registerReloadListener(new TwitchChatResourceReloadListener());
+    ResourceLoader.get(PackType.CLIENT_RESOURCES)
+        .registerReloader(Constants.id("reload"), new TwitchChatResourceReloadListener());
 
     if (CONFIG.autoConnect()) {
       autoConnect();
@@ -43,7 +44,7 @@ public class TwitchChatMod implements ModInitializer {
   }
 
   private static void autoConnect() {
-    if (CONFIG.channel().equals("") || CONFIG.credentials.oauthKey().equals("")) {
+    if (CONFIG.channel().isEmpty() || CONFIG.credentials.oauthKey().isEmpty()) {
       LOGGER.info("Auto-Connect enabled, but no channel or oauth key set. Please set up your config and enable the bot manually by running \"/{} enable\".", CONFIG.command());
       return;
     }

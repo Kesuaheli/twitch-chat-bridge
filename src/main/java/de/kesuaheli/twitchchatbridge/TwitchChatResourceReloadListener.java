@@ -1,8 +1,7 @@
 package de.kesuaheli.twitchchatbridge;
 
 import de.kesuaheli.twitchchatbridge.badge.Badge;
-import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
-import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import org.jspecify.annotations.NonNull;
 
@@ -13,14 +12,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class TwitchChatResourceReloadListener implements IdentifiableResourceReloadListener {
-  /**
-   * @return The unique identifier of this listener.
-   */
-  @Override
-  public @NonNull Identifier getFabricId() {
-    return Identifier.fromNamespaceAndPath("twitchchat", "reload");
-  }
+public class TwitchChatResourceReloadListener implements PreparableReloadListener {
 
   /**
    * Performs a reload. Returns a future that is completed when the reload

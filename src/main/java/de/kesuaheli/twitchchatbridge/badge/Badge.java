@@ -298,7 +298,7 @@ public class Badge {
                 String channelName = matcher.group("channelName");
                 if (channelName != null) {
                     if (TwitchChatMod.bot == null) {
-                        TwitchChatMod.LOGGER.warn("Couldn't add resource pack override of channel '" + channelName + "' because bot isn't running yet.");
+                        TwitchChatMod.LOGGER.warn("Couldn't add resource pack override of channel '{}' because bot isn't running yet.", channelName);
                         return;
                     }
                     channelID = TwitchChatMod.bot.getUserID(channelName);

@@ -4,6 +4,7 @@ import com.mojang.blaze3d.font.GlyphProvider;
 import com.mojang.blaze3d.font.UnbakedGlyph;
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
+import de.kesuaheli.twitchchatbridge.util.Constants;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.font.FontOption;
@@ -19,7 +20,7 @@ import org.jspecify.annotations.NonNull;
 import java.util.List;
 
 public class BadgeFont implements GlyphProvider {
-    public static final Identifier IDENTIFIER = Identifier.fromNamespaceAndPath("twitchchat", "badge");
+    public static final Identifier IDENTIFIER = Constants.id("badge");
     public static final FontDescription.Resource BADGE_FONT = new FontDescription.Resource(BadgeFont.IDENTIFIER);
     public static FontSet fontStorage;
     public static final List<GlyphProvider.Conditional> FONT_FILTERS = List.of(new GlyphProvider.Conditional(new BadgeFont(), FontOption.Filter.ALWAYS_PASS));
