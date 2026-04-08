@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version "${loom_version}"
+	id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
 	id 'maven-publish'
 }
 
@@ -14,6 +14,8 @@ repositories {
 	maven { url = 'https://maven.terraformersmc.com/'}
 	maven { url = 'https://maven.wispforest.io/releases/'}
 	maven { url = "https://maven.awakenedredstone.com"}
+
+	maven { url = "https://jitpack.io"}
 }
 
 loom {
@@ -22,7 +24,7 @@ loom {
 
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.minecraft_version}+${project.yarn_version}:v2"
+	mappings loom.officialMojangMappings()
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
@@ -31,6 +33,7 @@ dependencies {
 	include("io.wispforest:owo-sentinel:${project.owo_config_version}")
 
 	modImplementation("com.github.twitch4j:twitch4j-fabric:${project.twitch4j_version}")
+	include "commons-logging:commons-logging:1.2"
 }
 
 Map<String, String> replaceProperties = [
@@ -75,7 +78,7 @@ java {
 
 jar {
 	from("LICENSE") {
-		rename { "${it}_${project.archivesBaseName}"}
+		rename { "${it}_${project.base.archivesName}"}
 	}
 }
 

@@ -3,18 +3,18 @@ package de.kesuaheli.twitchchatbridge.badge;
 import com.github.twitch4j.helix.domain.ChatBadge;
 import com.github.twitch4j.helix.domain.ChatBadgeSet;
 import com.github.twitch4j.helix.domain.User;
+import com.mojang.blaze3d.platform.NativeImage;
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.resource.Resource;
-import net.minecraft.resource.ResourceFinder;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.FileToIdConverter;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,8 +30,8 @@ import java.util.regex.Pattern;
 
 public class Badge {
     private final String name;
-    private MutableText displayName;
-    private Text description;
+    private MutableComponent displayName;
+    private Component description;
     Map<String, ChannelOverride> channelOverrides = new HashMap<>();
     int codepoint;
     NativeImage image;
@@ -50,7 +50,7 @@ public class Badge {
     public Badge(ChatBadgeSet chatBadgeSet) {
         this.name = chatBadgeSet.getSetId();
         ChatBadge lastVersion = chatBadgeSet.getVersions().getLast();
-        this.displayName = Text.literal(lastVersion.getTitle());
+        this.displayName = Component.literal(lastVersion.getTitle());
         setDescription(lastVersion.getDescription());
 
         try {
@@ -67,7 +67,7 @@ public class Badge {
 
     public Badge(User user) {
         this.name = "@"+user.getLogin();
-        this.displayName = Text.literal(user.getDisplayName());
+        this.displayName = Component.literal(user.getDisplayName());
         setDescription(user.getDescription());
 
         try {
@@ -152,9 +152,9 @@ public class Badge {
     /**
      * @return The display text of the badge.
      */
-    public MutableText getDisplayName() {
+    public MutableComponent getDisplayName() {
         if (this.displayName == null) {
-            return Text.empty();
+            return Component.empty();
         }
         return this.displayName.copy();
     }
@@ -162,7 +162,7 @@ public class Badge {
     /**
      * @param displayName The updated display text.
      */
-    public void setDisplayName(MutableText displayName) {
+    public void setDisplayName(MutableComponent displayName) {
         this.displayName = displayName;
     }
 
@@ -170,20 +170,20 @@ public class Badge {
      * @param displayName The updated display text.
      */
     public void setDisplayName(String displayName) {
-        setDisplayName(Text.literal(displayName));
+        setDisplayName(Component.literal(displayName));
     }
 
     /**
      * @return Whether the badge has a display name.
      */
     public boolean hasDisplayName() {
-        return this.displayName != null && !Objects.equals(this.getDisplayName().getLiteralString(), "");
+        return this.displayName != null && !Objects.equals(this.getDisplayName().tryCollapseToString(), "");
     }
 
     /**
      * @return The description of the badge.
      */
-    public Text getDescription() {
+    public Component getDescription() {
         return description;
     }
 
@@ -191,26 +191,26 @@ public class Badge {
      * @param description The updated description text.
      */
     public void setDescription(String description) {
-        this.description = Text.literal(description).styled(style -> style.withColor(Formatting.GRAY).withItalic(true));
+        this.description = Component.literal(description).withStyle(style -> style.withColor(ChatFormatting.GRAY).withItalic(true));
     }
 
     /**
      * @return Whether the badge has a description.
      */
     public boolean hasDescription() {
-        return this.getDescription() != null && !Objects.equals(this.getDescription().getLiteralString(), "");
+        return this.getDescription() != null && !Objects.equals(this.getDescription().tryCollapseToString(), "");
     }
 
     public HoverEvent getHoverEvent() {
-        MutableText hoverText = Text.literal(this.name);
+        MutableComponent hoverText = Component.literal(this.name);
         if (this.hasDisplayName()) {
             hoverText = getDisplayName();
         }
         if (this.hasDescription()) {
             hoverText.append("\n").append(this.getDescription());
         }
-        hoverText.append(Text.literal("\ntwitchchat:" + this.name).styled(style -> style
-            .withColor(Formatting.DARK_GRAY)
+        hoverText.append(Component.literal("\ntwitchchat:" + this.name).withStyle(style -> style
+            .withColor(ChatFormatting.DARK_GRAY)
         ));
         return new HoverEvent.ShowText(hoverText);
     }
@@ -239,7 +239,7 @@ public class Badge {
     /**
      * @return The ready to use text component of the badge.
      */
-    public Text toText() {
+    public Component toText() {
         ClickEvent clickEvent = null;
         if (this.name.startsWith("@")) {
             try {
@@ -250,7 +250,7 @@ public class Badge {
             }
         }
         final var finalClickEvent = clickEvent;
-        return Text.literal(this.getChar()).styled(style -> style
+        return Component.literal(this.getChar()).withStyle(style -> style
             .withFont(BadgeFont.BADGE_FONT)
             .withHoverEvent(this.getHoverEvent())
             .withClickEvent(finalClickEvent)
@@ -277,10 +277,10 @@ public class Badge {
      */
     public static void loadBadges() {
         String startingPath = "textures/badge";
-        ResourceManager resourceManager = MinecraftClient.getInstance().getResourceManager();
-        ResourceFinder finder = new ResourceFinder(startingPath, ".png");
+        ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
+        FileToIdConverter finder = new FileToIdConverter(startingPath, ".png");
 
-        Map<Identifier, Resource> resources = finder.findResources(resourceManager);
+        Map<Identifier, Resource> resources = finder.listMatchingResources(resourceManager);
 
         if (resources.isEmpty()) {
             return;
@@ -307,7 +307,7 @@ public class Badge {
 
             NativeImage image;
             try {
-                image = NativeImage.read(resource.getInputStream());
+                image = NativeImage.read(resource.open());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

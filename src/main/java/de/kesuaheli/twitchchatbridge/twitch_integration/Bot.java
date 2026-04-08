@@ -9,8 +9,8 @@ import com.github.twitch4j.helix.domain.User;
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
 import de.kesuaheli.twitchchatbridge.badge.Badge;
 import de.kesuaheli.twitchchatbridge.badge.BadgeFont;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -102,7 +102,7 @@ public class Bot {
 
   public void onNotice(ChannelNoticeEvent event) {
     System.out.println("TWITCH NOTICE: " + event.toString());
-    TwitchChatMod.addNotification(Text.literal(event.getMessage()));
+    TwitchChatMod.addNotification(Component.literal(event.getMessage()));
   }
 
 
@@ -129,7 +129,7 @@ public class Bot {
     String ID = getUserID(event.getChannel().getName());
     if (Objects.equals(this.channelID, ID)) return;
     this.channelID = ID;
-    TwitchChatMod.addNotification(Text.translatable("text.twitchchat.bot.connected", event.getChannel().getName()));
+    TwitchChatMod.addNotification(Component.translatable("text.twitchchat.bot.connected", event.getChannel().getName()));
   }
 
   public void sendMessage(String message) {
@@ -171,7 +171,7 @@ public class Bot {
   }
 
   public void putFormattingColor(String nick, TextColor color) {
-    if (nick == null || nick.equals("") || color == null) return;
+    if (nick == null || nick.isEmpty() || color == null) return;
     formattingColorCache.put(nick.toLowerCase(), color);
   }
   public void putFormattingColor(String nick, String color) {
