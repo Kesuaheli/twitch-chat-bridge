@@ -2,11 +2,11 @@ package de.kesuaheli.twitchchatbridge.commands;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import de.kesuaheli.twitchchatbridge.TwitchChatMod;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.text.Text;
-import net.minecraft.util.StringIdentifiable;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.StringRepresentable;
+import org.jspecify.annotations.NonNull;
 
 import java.util.function.Consumer;
 
@@ -20,14 +20,14 @@ public class TwitchConfigCommand extends LiteralArgumentBuilder<FabricClientComm
     );
   }
 
-  public enum ConfigOption implements StringIdentifiable {
+  public enum ConfigOption implements StringRepresentable {
     RELOAD(ctx -> {
       CONFIG.load();
-      ctx.getSource().sendFeedback(Text.literal("config reloaded"));
+      ctx.getSource().sendFeedback(Component.literal("config reloaded"));
     }),
     SAVE(ctx -> {
       CONFIG.save();
-      ctx.getSource().sendFeedback(Text.literal("config saved"));
+      ctx.getSource().sendFeedback(Component.literal("config saved"));
     });
 
     private final Consumer<CommandContext<FabricClientCommandSource>> consumer;
@@ -46,7 +46,7 @@ public class TwitchConfigCommand extends LiteralArgumentBuilder<FabricClientComm
      * {@return the unique string representation of the enum, used for serialization}
      */
     @Override
-    public String asString() {
+    public @NonNull String getSerializedName() {
       return this.toString().toLowerCase();
     }
   }

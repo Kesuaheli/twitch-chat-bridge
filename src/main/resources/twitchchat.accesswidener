@@ -1,4 +1,5 @@
 accessWidener v2 named
 
-accessible class net/minecraft/client/font/BitmapFont$BitmapFontGlyph
-accessible method net/minecraft/client/font/BitmapFont$BitmapFontGlyph <init> (FLnet/minecraft/client/texture/NativeImage;IIIIII)V
+accessible class net/minecraft/client/gui/font/providers/BitmapProvider$Glyph
+accessible method net/minecraft/client/gui/font/providers/BitmapProvider$Glyph <init> (FLcom/mojang/blaze3d/platform/NativeImage;IIIIII)V
+accessible class net/minecraft/client/gui/font/FontManager$Preparation

@@ -7,14 +7,13 @@ import de.kesuaheli.twitchchatbridge.config.ModConfig;
 import de.kesuaheli.twitchchatbridge.twitch_integration.Bot;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.packs.PackType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +34,7 @@ public class TwitchChatMod implements ModInitializer {
       dispatcher.register(new TwitchBaseCommand()));
 
     // Register reload listener
-    ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES)
+    ResourceManagerHelper.get(PackType.CLIENT_RESOURCES)
         .registerReloadListener(new TwitchChatResourceReloadListener());
 
     if (CONFIG.autoConnect()) {
@@ -54,25 +53,25 @@ public class TwitchChatMod implements ModInitializer {
     bot.start();
   }
 
-  public static void addTwitchMessage(Text message) {
-    if (MinecraftClient.getInstance().player == null) {
+  public static void addTwitchMessage(Component message) {
+    if (Minecraft.getInstance().player == null) {
       return;
     }
 
     if (CONFIG.broadcast()) {
-      if (MinecraftClient.getInstance().player != null) {
-        MinecraftClient.getInstance().player.sendMessage(message, false);
+      if (Minecraft.getInstance().player != null) {
+        Minecraft.getInstance().player.displayClientMessage(message, false);
         return;
       }
     }
-    MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(message);
+    Minecraft.getInstance().gui.getChat().addMessage(message);
   }
 
-  public static void addNotification(MutableText message) {
-    if (MinecraftClient.getInstance().player == null) {
+  public static void addNotification(MutableComponent message) {
+    if (Minecraft.getInstance().player == null) {
       return;
     }
 
-    MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(message.formatted(Formatting.DARK_GRAY));
+    Minecraft.getInstance().gui.getChat().addMessage(message.withStyle(ChatFormatting.DARK_GRAY));
   }
 }

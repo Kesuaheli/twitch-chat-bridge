@@ -4,8 +4,8 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 
 public class TwitchDisableCommand extends LiteralArgumentBuilder<FabricClientCommandSource> {
   TwitchDisableCommand() {
@@ -15,12 +15,12 @@ public class TwitchDisableCommand extends LiteralArgumentBuilder<FabricClientCom
 
   private int execute(CommandContext<FabricClientCommandSource> ctx) {
     if (TwitchChatMod.bot == null || !TwitchChatMod.bot.isConnected()) {
-      ctx.getSource().sendFeedback(Text.translatable("text.twitchchat.command.disable.already_disabled"));
+      ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.disable.already_disabled"));
       return 0;
     }
 
     TwitchChatMod.bot.stop();
-    ctx.getSource().sendFeedback(Text.translatable("text.twitchchat.command.disable.disabled").formatted(Formatting.DARK_GRAY));
+    ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.disable.disabled").withStyle(ChatFormatting.DARK_GRAY));
     return 1;
   }
 }

@@ -6,7 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 import static de.kesuaheli.twitchchatbridge.TwitchChatMod.CONFIG;
 
@@ -25,10 +25,10 @@ public class TwitchWatchCommand extends LiteralArgumentBuilder<FabricClientComma
     CONFIG.channel(channelName);
     // Also switch channels if the bot has been initialized
     if (TwitchChatMod.bot != null) {
-      ctx.getSource().sendFeedback(Text.translatable("text.twitchchat.command.watch.switching", channelName));
+      ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.watch.switching", channelName));
       TwitchChatMod.bot.joinChannel(channelName);
     } else {
-      ctx.getSource().sendFeedback(Text.translatable("text.twitchchat.command.watch.connect_on_enable", channelName));
+      ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.watch.connect_on_enable", channelName));
     }
     CONFIG.save();
     return 1;

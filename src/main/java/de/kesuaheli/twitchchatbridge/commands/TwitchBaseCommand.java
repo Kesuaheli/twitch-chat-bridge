@@ -3,7 +3,7 @@ package de.kesuaheli.twitchchatbridge.commands;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 public class TwitchBaseCommand extends LiteralArgumentBuilder<FabricClientCommandSource> {
   public TwitchBaseCommand() {
@@ -14,8 +14,8 @@ public class TwitchBaseCommand extends LiteralArgumentBuilder<FabricClientComman
     then(new TwitchBroadcastCommand());
     then(new TwitchConfigCommand());
     executes(ctx -> {
-      ctx.getSource().sendFeedback(Text.translatable("text.twitchchat.command.base.noargs1"));
-      ctx.getSource().sendFeedback(Text.translatable("text.twitchchat.command.base.noargs2"));
+      ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.base.noargs1"));
+      ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.base.noargs2"));
       return 1;
     });
   }

@@ -2,8 +2,9 @@ package de.kesuaheli.twitchchatbridge;
 
 import de.kesuaheli.twitchchatbridge.badge.Badge;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
-import net.minecraft.resource.ReloadableResourceManagerImpl;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.resources.ReloadableResourceManager;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -17,8 +18,8 @@ public class TwitchChatResourceReloadListener implements IdentifiableResourceRel
    * @return The unique identifier of this listener.
    */
   @Override
-  public Identifier getFabricId() {
-    return Identifier.of("twitchchat", "reload");
+  public @NonNull Identifier getFabricId() {
+    return Identifier.fromNamespaceAndPath("twitchchat", "reload");
   }
 
   /**
@@ -43,11 +44,11 @@ public class TwitchChatResourceReloadListener implements IdentifiableResourceRel
    * @param synchronizer    the synchronizer
    * @param applyExecutor   the apply executor
    * @return a future for the reload
-   * @see ReloadableResourceManagerImpl#reload(Executor, Executor,
+   * @see ReloadableResourceManager#createReload(Executor, Executor,
    * CompletableFuture, List)
    */
   @Override
-  public CompletableFuture<Void> reload(Store store, Executor prepareExecutor, Synchronizer synchronizer, Executor applyExecutor) {
+  public @NonNull CompletableFuture<Void> reload(@NonNull SharedState store, @NonNull Executor prepareExecutor, PreparationBarrier synchronizer, @NonNull Executor applyExecutor) {
 
     CompletableFuture<Void> preparedAction = CompletableFuture.supplyAsync(() -> {
       TwitchChatMod.BADGES.clearResourcePackOverrides();
@@ -56,7 +57,7 @@ public class TwitchChatResourceReloadListener implements IdentifiableResourceRel
     }, prepareExecutor);
 
     return preparedAction
-        .thenCompose(synchronizer::whenPrepared)
+        .thenCompose(synchronizer::wait)
         .thenAcceptAsync(void_ -> {}, applyExecutor);
   }
 }

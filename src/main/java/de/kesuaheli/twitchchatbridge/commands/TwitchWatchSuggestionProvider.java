@@ -5,8 +5,8 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.AbstractClientPlayer;
 
 import static de.kesuaheli.twitchchatbridge.TwitchChatMod.CONFIG;
 
@@ -17,10 +17,10 @@ public class TwitchWatchSuggestionProvider implements SuggestionProvider<FabricC
 
     @Override
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<FabricClientCommandSource> context, SuggestionsBuilder builder) {
-        if (MinecraftClient.getInstance().world != null && CONFIG.twitchWatchSuggestions()) {
-            List<AbstractClientPlayerEntity> players = MinecraftClient.getInstance().world.getPlayers();
+        if (Minecraft.getInstance().level != null && CONFIG.twitchWatchSuggestions()) {
+            List<AbstractClientPlayer> players = Minecraft.getInstance().level.players();
 
-            for (AbstractClientPlayerEntity player : players) {
+            for (AbstractClientPlayer player : players) {
                 builder.suggest(player.getName().getString());
             }
         }

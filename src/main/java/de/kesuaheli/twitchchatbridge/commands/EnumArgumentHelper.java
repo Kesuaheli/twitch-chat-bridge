@@ -1,13 +1,13 @@
 package de.kesuaheli.twitchchatbridge.commands;
 
-import net.minecraft.command.argument.EnumArgumentType;
-import net.minecraft.util.StringIdentifiable;
+import net.minecraft.commands.arguments.StringRepresentableArgument;
+import net.minecraft.util.StringRepresentable;
 
-public class EnumArgumentHelper<E extends Enum<E> & StringIdentifiable> extends EnumArgumentType<E> {
+public class EnumArgumentHelper<E extends Enum<E> & StringRepresentable> extends StringRepresentableArgument<E> {
 
   EnumArgumentHelper(E[] values) {
     super(
-      StringIdentifiable.createCodec(() -> values),
+      StringRepresentable.fromEnum(() -> values),
       () -> values);
   }
 }

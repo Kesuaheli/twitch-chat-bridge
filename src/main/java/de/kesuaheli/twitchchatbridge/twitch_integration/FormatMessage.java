@@ -5,9 +5,9 @@ import com.github.twitch4j.helix.domain.User;
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
 import de.kesuaheli.twitchchatbridge.badge.Badge;
 import de.kesuaheli.twitchchatbridge.badge.BadgeFont;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,7 +21,7 @@ import static de.kesuaheli.twitchchatbridge.TwitchChatMod.CONFIG;
 public class FormatMessage {
 
   public static void formatAndSend(AbstractChannelMessageEvent event, boolean isActionMessage) {
-    Text formattedMessage = FormatMessage.formatMessage(event, isActionMessage);
+    Component formattedMessage = FormatMessage.formatMessage(event, isActionMessage);
     if (formattedMessage == null) return;
 
     TwitchChatMod.addTwitchMessage(formattedMessage);
@@ -32,12 +32,12 @@ public class FormatMessage {
   }
 
   public static void formatAndSend(Date time, List<Badge> badges, String username, String message, boolean isActionMessage) {
-    Text formattedMessage = formatMessage(time, getUserAvatarBadge(CONFIG.avatarBadge() ? TwitchChatMod.bot.getChannelID() : null), badges, username, message, isActionMessage);
+    Component formattedMessage = formatMessage(time, getUserAvatarBadge(CONFIG.avatarBadge() ? TwitchChatMod.bot.getChannelID() : null), badges, username, message, isActionMessage);
 
     TwitchChatMod.addTwitchMessage(formattedMessage);
   }
 
-  public static @Nullable Text formatMessage(AbstractChannelMessageEvent event, boolean isActionMessage) {
+  public static @Nullable Component formatMessage(AbstractChannelMessageEvent event, boolean isActionMessage) {
     String nick = event.getMessageEvent().getUserDisplayName().orElse(event.getUser().getName());
     if (CONFIG.ignoreList().stream().anyMatch(nick::equalsIgnoreCase)) {
       return null;
@@ -65,29 +65,29 @@ public class FormatMessage {
     );
   }
 
-  public static @NotNull Text formatMessage(Date time, Text avatar, List<Badge> badges, String username, String message, boolean isActionMessage) {
+  public static @NotNull Component formatMessage(Date time, Component avatar, List<Badge> badges, String username, String message, boolean isActionMessage) {
     if (!TwitchChatMod.bot.isFormattingColorCached(username)) {
       TwitchChatMod.bot.putFormattingColor(username);
     }
 
-    MutableText text = Text.literal(formatDateTwitch(time));
+    MutableComponent text = Component.literal(formatDateTwitch(time));
 
-    MutableText prefixText = Text.literal(CONFIG.broadcastPrefix()).styled(style -> style.withColor(Formatting.DARK_PURPLE));
+    MutableComponent prefixText = Component.literal(CONFIG.broadcastPrefix()).withStyle(style -> style.withColor(ChatFormatting.DARK_PURPLE));
     text.append(prefixText);
 
     text.append(avatar);
 
-    MutableText usernameText = Text.literal("");
+    MutableComponent usernameText = Component.literal("");
     badges.forEach(badge -> usernameText.append(badge.toText()));
-    usernameText.append(Text.literal(username).styled(style -> style.withColor(TwitchChatMod.bot.getFormattingColor(username))));
+    usernameText.append(Component.literal(username).withStyle(style -> style.withColor(TwitchChatMod.bot.getFormattingColor(username))));
 
     message = sanitiseMessage(message);
     if (isActionMessage) {
-      Text messageText = Text.literal(message).styled(style -> style.withColor(TwitchChatMod.bot.getFormattingColor(username)));
-      text.append(Text.translatable("chat.type.emote", usernameText, messageText));
+      Component messageText = Component.literal(message).withStyle(style -> style.withColor(TwitchChatMod.bot.getFormattingColor(username)));
+      text.append(Component.translatable("chat.type.emote", usernameText, messageText));
     }
     else {
-      text.append(Text.translatable("options.generic_value", usernameText, message));
+      text.append(Component.translatable("options.generic_value", usernameText, message));
     }
 
     return text;
@@ -105,12 +105,12 @@ public class FormatMessage {
     return sf.format(date);
   }
 
-  private static @NotNull Text getUserAvatarBadge(@Nullable String userID) {
-    if (userID == null || userID.equals("")) return Text.empty();
+  private static @NotNull Component getUserAvatarBadge(@Nullable String userID) {
+    if (userID == null || userID.isEmpty()) return Component.empty();
 
     User user = TwitchChatMod.bot.getUserByID(userID);
     if (user == null) {
-      return Text.empty();
+      return Component.empty();
     }
 
     Badge badge;

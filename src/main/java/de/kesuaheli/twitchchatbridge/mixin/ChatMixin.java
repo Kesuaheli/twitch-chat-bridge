@@ -2,8 +2,8 @@ package de.kesuaheli.twitchchatbridge.mixin;
 
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
 import de.kesuaheli.twitchchatbridge.twitch_integration.FormatMessage;
-import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.screens.ChatScreen;
+import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -15,13 +15,13 @@ import static de.kesuaheli.twitchchatbridge.TwitchChatMod.CONFIG;
 
 @Mixin(ChatScreen.class)
 public class ChatMixin {
-  @Inject(at = @At("HEAD"), method = "sendMessage", cancellable = true)
-  private void sendMessage(String message, boolean addToHistory, CallbackInfo info) {
+  @Inject(at = @At("HEAD"), method = "handleChatInput", cancellable = true)
+  private void handleChatInput(String message, boolean addToHistory, CallbackInfo info) {
     String prefix = CONFIG.prefix();
 
     // Allow users to write /twitch commands (such as disabling and enabling the mod) when their prefix is "".
     if (!message.startsWith(prefix) ||
-        prefix.equals("") && message.startsWith("/"+ CONFIG.command()+" ")
+        prefix.isEmpty() && message.startsWith("/"+ CONFIG.command()+" ")
     ) {
       return;
     }
@@ -30,7 +30,7 @@ public class ChatMixin {
     info.cancel();
 
     if (TwitchChatMod.bot == null || !TwitchChatMod.bot.isConnected()) {
-      TwitchChatMod.addNotification(Text.translatable("text.twitchchat.chat.integration_disabled"));
+      TwitchChatMod.addNotification(Component.translatable("text.twitchchat.chat.integration_disabled"));
       return;
     }
     message = message.replaceFirst("^"+Pattern.quote(prefix), "");
