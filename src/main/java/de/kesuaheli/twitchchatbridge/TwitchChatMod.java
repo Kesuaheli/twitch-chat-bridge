@@ -1,5 +1,6 @@
 package de.kesuaheli.twitchchatbridge;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import de.kesuaheli.twitchchatbridge.badge.BadgeSet;
 import de.kesuaheli.twitchchatbridge.commands.TwitchBaseCommand;
 import de.kesuaheli.twitchchatbridge.config.ModConfigFile;
@@ -65,7 +66,12 @@ public class TwitchChatMod implements ModInitializer {
         return;
       }
     }
-    Minecraft.getInstance().gui.getChat().addMessage(message);
+
+    if (RenderSystem.isOnRenderThread()) {
+      Minecraft.getInstance().gui.getChat().addMessage(message);
+    } else {
+      Minecraft.getInstance().executeIfPossible(() -> Minecraft.getInstance().gui.getChat().addMessage(message));
+    }
   }
 
   public static void addNotification(MutableComponent message) {
