@@ -16,7 +16,7 @@ import static de.kesuaheli.twitchchatbridge.TwitchChatMod.CONFIG;
 @Mixin(ChatScreen.class)
 public class ChatMixin {
   @Inject(at = @At("HEAD"), method = "handleChatInput", cancellable = true)
-  private void handleChatInput(String message, boolean addToHistory, CallbackInfo info) {
+  private void handleChatInput(String message, boolean addToRecent, CallbackInfo info) {
     String prefix = CONFIG.prefix();
 
     // Allow users to write /twitch commands (such as disabling and enabling the mod) when their prefix is "".
