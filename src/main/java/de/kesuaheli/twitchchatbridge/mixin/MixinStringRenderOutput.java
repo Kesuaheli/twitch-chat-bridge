@@ -27,7 +27,7 @@ public class MixinStringRenderOutput {
     private TextureManager textureManager;
 
     @Inject(method="apply", at=@At("RETURN"))
-    public void afterapply(FontManager.Preparation preparation, ProfilerFiller profilerFiller, CallbackInfo ci) {
+    public void afterApply(FontManager.Preparation preparations, ProfilerFiller profiler, CallbackInfo ci) {
         fontSets.put(BadgeFont.IDENTIFIER, BadgeFont.newFontStorage(this.textureManager));
         TwitchChatMod.LOGGER.info("Added badge font: {}", BadgeFont.IDENTIFIER);
     }
