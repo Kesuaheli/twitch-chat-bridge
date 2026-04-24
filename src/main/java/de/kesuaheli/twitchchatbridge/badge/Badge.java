@@ -47,25 +47,40 @@ public class Badge {
         this.image = image;
     }
 
-    public Badge(ChatBadgeSet chatBadgeSet) {
+    public Badge(ChatBadgeSet chatBadgeSet) throws IOException, URISyntaxException {
         this.name = chatBadgeSet.getSetId();
         ChatBadge lastVersion = chatBadgeSet.getVersions().getLast();
         this.displayName = Text.literal(lastVersion.getTitle());
         setDescription(lastVersion.getDescription());
 
-        try {
-            URI imageURI = new URI(lastVersion.getLargeImageUrl());
-            this.image = NativeImage.read(imageURI.toURL().openStream());
-        } catch (URISyntaxException | MalformedURLException e) {
-            TwitchChatMod.LOGGER.error("Couldn't parse " + this.name + " badge url '" + lastVersion.getLargeImageUrl() + "'");
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            TwitchChatMod.LOGGER.error("Couldn't read image data for " + this.name + " badge url '" + lastVersion.getLargeImageUrl() + "'");
-            throw new RuntimeException(e);
+        String[] tryURLs = {
+            lastVersion.getLargeImageUrl(),
+            lastVersion.getMediumImageUrl(),
+            lastVersion.getSmallImageUrl(),
+        };
+        for (int i = 0; i < tryURLs.length; i++) {
+            if (i != 0) {
+                TwitchChatMod.LOGGER.info("trying next resolution for badge {}", this.name);
+            }
+            try {
+                URI imageURI = new URI(tryURLs[i]);
+                this.image = NativeImage.read(imageURI.toURL().openStream());
+                break;
+            } catch (URISyntaxException | MalformedURLException e) {
+                TwitchChatMod.LOGGER.warn("Couldn't parse {} badge url '{}'", this.name, tryURLs[i]);
+                if (i >= tryURLs.length-1) {
+                    throw e;
+                }
+            } catch (IOException e) {
+                TwitchChatMod.LOGGER.warn("Couldn't read image data for {} badge url '{}'", this.name, tryURLs[i]);
+                if (i >= tryURLs.length-1) {
+                    throw e;
+                }
+            }
         }
     }
 
-    public Badge(User user) {
+    public Badge(User user) throws IOException, URISyntaxException {
         this.name = "@"+user.getLogin();
         this.displayName = Text.literal(user.getDisplayName());
         setDescription(user.getDescription());
@@ -77,11 +92,11 @@ public class Badge {
             image.resizeSubRectTo(0,0, image.getHeight(), image.getHeight(), this.image);
             image.close();
         } catch (URISyntaxException | MalformedURLException e) {
-            TwitchChatMod.LOGGER.error("Couldn't parse " + user.getLogin() + " avatar url '" + user.getProfileImageUrl() + "'");
-            throw new RuntimeException(e);
+            TwitchChatMod.LOGGER.error("Couldn't parse {} avatar url '{}'", user.getLogin(), user.getProfileImageUrl());
+            throw e;
         } catch (IOException e) {
-            TwitchChatMod.LOGGER.error("Couldn't read image data for " + user.getLogin() + " avatar url '" + user.getProfileImageUrl() + "'");
-            throw new RuntimeException(e);
+            TwitchChatMod.LOGGER.error("Couldn't read image data for {} avatar url '{}'", user.getLogin(), user.getProfileImageUrl());
+            throw e;
         }
     }
 
