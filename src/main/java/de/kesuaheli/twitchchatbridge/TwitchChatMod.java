@@ -79,6 +79,10 @@ public class TwitchChatMod implements ModInitializer {
       return;
     }
 
-    Minecraft.getInstance().gui.getChat().addMessage(message.withStyle(ChatFormatting.DARK_GRAY));
+    if (RenderSystem.isOnRenderThread()) {
+      Minecraft.getInstance().gui.getChat().addMessage(message.withStyle(ChatFormatting.DARK_GRAY));
+    } else {
+      Minecraft.getInstance().executeIfPossible(() -> Minecraft.getInstance().gui.getChat().addMessage(message.withStyle(ChatFormatting.DARK_GRAY)));
+    }
   }
 }
