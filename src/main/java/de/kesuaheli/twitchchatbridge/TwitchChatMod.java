@@ -32,12 +32,12 @@ public class TwitchChatMod implements ModInitializer {
     if (!hasNewConfig) ModConfigFile.loadLegacy();
 
     // Register commands
-    ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
+    ClientCommandRegistrationCallback.EVENT.register((dispatcher, buildContext) ->
       dispatcher.register(new TwitchBaseCommand()));
 
     // Register reload listener
     ResourceLoader.get(PackType.CLIENT_RESOURCES)
-        .registerReloader(Constants.id("reload"), new TwitchChatResourceReloadListener());
+        .registerReloadListener(Constants.id("reload"), new TwitchChatResourceReloadListener());
 
     if (CONFIG.autoConnect()) {
       autoConnect();
@@ -61,16 +61,14 @@ public class TwitchChatMod implements ModInitializer {
     }
 
     if (CONFIG.broadcast()) {
-      if (Minecraft.getInstance().player != null) {
-        Minecraft.getInstance().player.displayClientMessage(message, false);
-        return;
-      }
+      Minecraft.getInstance().player.connection.sendChat(message.getString());
+      return;
     }
 
     if (RenderSystem.isOnRenderThread()) {
-      Minecraft.getInstance().gui.getChat().addMessage(message);
+      Minecraft.getInstance().gui.getChat().addClientSystemMessage(message);
     } else {
-      Minecraft.getInstance().executeIfPossible(() -> Minecraft.getInstance().gui.getChat().addMessage(message));
+      Minecraft.getInstance().executeIfPossible(() -> Minecraft.getInstance().gui.getChat().addClientSystemMessage(message));
     }
   }
 
@@ -80,9 +78,9 @@ public class TwitchChatMod implements ModInitializer {
     }
 
     if (RenderSystem.isOnRenderThread()) {
-      Minecraft.getInstance().gui.getChat().addMessage(message.withStyle(ChatFormatting.DARK_GRAY));
+      Minecraft.getInstance().gui.getChat().addClientSystemMessage(message.withStyle(ChatFormatting.DARK_GRAY));
     } else {
-      Minecraft.getInstance().executeIfPossible(() -> Minecraft.getInstance().gui.getChat().addMessage(message.withStyle(ChatFormatting.DARK_GRAY)));
+      Minecraft.getInstance().executeIfPossible(() -> Minecraft.getInstance().gui.getChat().addClientSystemMessage(message.withStyle(ChatFormatting.DARK_GRAY)));
     }
   }
 }
