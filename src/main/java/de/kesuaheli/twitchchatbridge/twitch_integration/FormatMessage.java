@@ -11,12 +11,15 @@ import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import static de.kesuaheli.twitchchatbridge.TwitchChatMod.CONFIG;
+import static de.kesuaheli.twitchchatbridge.TwitchChatMod.LOGGER;
 
 public class FormatMessage {
 
@@ -117,7 +120,12 @@ public class FormatMessage {
     try {
       badge = TwitchChatMod.BADGES.get("@" + user.getLogin());
     } catch (IllegalArgumentException e) {
-      badge = new Badge(user);
+      try {
+        badge = new Badge(user);
+      } catch (URISyntaxException | IOException ex) {
+        TwitchChatMod.LOGGER.error("Failed to resolve user avatar badge for @{}", user.getLogin());
+        return Component.empty();
+      }
       TwitchChatMod.BADGES.add(badge);
       BadgeFont.reload();
       TwitchChatMod.LOGGER.info("Added Avatar badge for user {} ({})", user.getDisplayName(), user.getLogin());
