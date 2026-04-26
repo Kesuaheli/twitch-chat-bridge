@@ -1,11 +1,16 @@
 package de.kesuaheli.twitchchatbridge.badge;
 
+import com.github.twitch4j.helix.domain.ChatBadgeSet;
+import de.kesuaheli.twitchchatbridge.TwitchChatMod;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.ints.IntSets;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 public class BadgeSet {
   private static final char MIN_CHAR = ' ' + 1;
@@ -35,14 +40,16 @@ public class BadgeSet {
 
   /**
    * Access the global badge for the given name. You may want to use
-   * {@link BadgeSet#get(String channelID, String name)} instead to also include the channel specific badges.
+   * {@link BadgeSet#get(String channelID, String name, String version)} instead to also include the channel specific
+   * badges.
    * @param name The name to search the badge for.
+   * @param version The version to search the badge for.
    * @return The badge for the name.
    * @throws IllegalArgumentException If the given name is not a global badge.
    */
-  public Badge get(String name) throws IllegalArgumentException {
+  public Badge get(String name, String version) throws IllegalArgumentException {
     return badges.values().stream()
-        .filter(badge -> badge.getName().equals(name))
+        .filter(badge -> badge.getName().equals(name) && badge.getVersion().equals(version))
         .findFirst()
         .orElseThrow(() -> new IllegalArgumentException("badge named '" + name + "' does not exist"));
   }
@@ -52,39 +59,44 @@ public class BadgeSet {
    * global badge.
    * @param channelID The channel ID to include in the search.
    * @param name The name to search the badge for.
+   * @param version The version to search the badge for.
    * @return The badge for the name.
    * @throws IllegalArgumentException If the given name is neither a channel badge nor a global badges.
    */
-  public Badge get(String channelID, String name) throws IllegalArgumentException {
-    Badge badge = get(name);
+  public Badge get(String channelID, String name, String version) throws IllegalArgumentException {
+    Badge badge = get(name, version);
     Badge.ChannelOverride override = badge.getChannelOverride(channelID);
     if (override == null) return badge;
     return override.toBadge();
   }
 
   /**
-   * Access the badge for the given name. Unlike {@link BadgeSet#get(String channelID, String name)} this method only
+   * Access the badge for the given name. Unlike {@link BadgeSet#get(String channelID, String name, String version)}
+   * this method only
    * searches for a channel badge but not a global badge.
    * @param channelID The channel ID of the badge.
    * @param name The name to search the badge for.
+   * @param version The version to search the badge for.
    * @return The badge for the name.
    * @throws IllegalArgumentException If the given name is neither a channel badge nor a global badges.
    */
-  public Badge getChannelOnly(String channelID, String name) {
-    Badge.ChannelOverride override = get(name).getChannelOverride(channelID);
+  public Badge getChannelOnly(String channelID, String name, String version) {
+    Badge.ChannelOverride override = get(name, version).getChannelOverride(channelID);
     if (override == null) throw new IllegalArgumentException("badge named '" + name + "' does not exist for channel '" + channelID + "'");
     return override.toBadge();
   }
 
   /**
    * Get the code point string for the given global badge name. You may want to use
-   * {@link BadgeSet#getChar(String channelID, String name)} instead to also include the channel specific badges.
+   * {@link BadgeSet#getChar(String channelID, String name, String version)} instead to also include the channel
+   * specific badges.
    * @param name The name to search the badge for.
+   * @param version The version to search the badge for.
    * @return The code point string to use this badge in a text.
    * @throws IllegalArgumentException If the given name is not a global badge.
    */
-  public String getChar(String name) throws IllegalArgumentException {
-    return get(name).getChar();
+  public String getChar(String name, String version) throws IllegalArgumentException {
+    return get(name, version).getChar();
   }
 
   /**
@@ -92,17 +104,48 @@ public class BadgeSet {
    * search for the global badge.
    * @param channelID The channel ID to include in the search.
    * @param name The name to search the badge for.
+   * @param version The version to search the badge for.
    * @return The code point string to use this badge in a text.
    * @throws IllegalArgumentException If the given name is neither a channel badge nor a global badge.
    */
-  public String getChar(String channelID, String name) throws IllegalArgumentException {
-    return get(channelID, name).getChar();
+  public String getChar(String channelID, String name, String version) throws IllegalArgumentException {
+    return get(channelID, name, version).getChar();
   }
 
   public void clearResourcePackOverrides() {
     badges.values().stream()
         .filter(Badge::hasResourcePackOverride)
         .forEach(Badge::unsetResourcePackOverride);
+  }
+
+  /**
+   * Adds multiple new global chat badges. Use {@link BadgeSet#add(String channelID, ChatBadgeSet chatBadgeSet)} to add
+   * channel specific badges instead. All badge versions in the given chatBadgeSet will be added.
+   * @param chatBadgeSet The set to extract the name and versions from.
+   */
+  public void add(ChatBadgeSet chatBadgeSet) {
+    add(null, chatBadgeSet);
+  }
+
+  /**
+   * Adds multiple new channel specific chat badges. User {@link BadgeSet#add(ChatBadgeSet chatBadgeSet)} to add global
+   * badges instead. All badge versions in the given chatBadgeSet will be added.
+   * @param channelID The channel ID to add the badges to.
+   * @param chatBadgeSet The set to extract the name and versions from.
+   */
+  public void add(String channelID, ChatBadgeSet chatBadgeSet) {
+    chatBadgeSet.getVersions().forEach(badgeVersion -> {
+      final Badge badge;
+      try {
+        badge = new Badge(chatBadgeSet.getSetId(), badgeVersion);
+      } catch (URISyntaxException | IOException e) {
+        String badgeType = channelID == null ? "global " : "";
+        String channel = channelID == null ? "" : " for channel "+channelID;
+        TwitchChatMod.LOGGER.warn("Skipping to add {}badge '{}'{} on version '{}' because of failure", badgeType, chatBadgeSet.getSetId(), channel, badgeVersion.getId());
+        return;
+      }
+      add(channelID, badge);
+    });
   }
 
   /**
@@ -113,7 +156,7 @@ public class BadgeSet {
   public void add(@NotNull Badge badge) {
     Badge badgeBefore;
     try {
-      badgeBefore = get(badge.getName());
+      badgeBefore = get(badge.getName(), badge.getVersion());
     } catch (IllegalArgumentException ignored){
       put(badge);
       return;
@@ -133,7 +176,7 @@ public class BadgeSet {
     }
     Badge parentBadge;
     try {
-      parentBadge = get(badge.getName());
+      parentBadge = get(badge.getName(), badge.getVersion());
     } catch (IllegalArgumentException ignored) {
       parentBadge = new Badge(badge);
       add(badge);

@@ -15,8 +15,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -88,7 +86,7 @@ public class Bot {
     this.userBadges = new ArrayList<>();
     event.getMessageEvent().getBadges().forEach((name,  version) -> {
       try {
-        Badge badge = TwitchChatMod.BADGES.get(name);
+        Badge badge = TwitchChatMod.BADGES.get(name, version);
         this.userBadges.add(badge);
       } catch (IllegalArgumentException ignored) {}
     });
@@ -202,26 +200,8 @@ public class Bot {
       twitchClient.getChat().joinChannel(this.channel); // Join the new channel
 
       String channelID = getUserID(channel);
-      twitchClient.getHelix().getGlobalChatBadges(this.oauthKey).execute().getBadgeSets().forEach(chatBadgeSet -> {
-        final Badge badge;
-        try {
-          badge = new Badge(chatBadgeSet);
-        } catch (URISyntaxException | IOException e) {
-          TwitchChatMod.LOGGER.warn("Skipping to add badge {} because of failure", chatBadgeSet.getSetId());
-          return;
-        }
-        TwitchChatMod.BADGES.add(badge);
-      });
-      twitchClient.getHelix().getChannelChatBadges(this.oauthKey, channelID).execute().getBadgeSets().forEach(chatBadgeSet -> {
-        final Badge badge;
-        try {
-          badge = new Badge(chatBadgeSet);
-        } catch (URISyntaxException | IOException e) {
-          TwitchChatMod.LOGGER.warn("Skipping to add badge {} for channel {} because of failure", chatBadgeSet.getSetId(), channelID);
-          return;
-        }
-        TwitchChatMod.BADGES.add(channelID, badge);
-      });
+      twitchClient.getHelix().getGlobalChatBadges(this.oauthKey).execute().getBadgeSets().forEach(TwitchChatMod.BADGES::add);
+      twitchClient.getHelix().getChannelChatBadges(this.oauthKey, channelID).execute().getBadgeSets().forEach(chatBadgeSet -> TwitchChatMod.BADGES.add(channelID, chatBadgeSet));
       BadgeFont.reload();
 
       handlePendingBadges();

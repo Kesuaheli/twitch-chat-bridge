@@ -49,7 +49,7 @@ public class FormatMessage {
     List<Badge> badges = new ArrayList<>();
     event.getMessageEvent().getBadges().forEach((name,  version) -> {
       try {
-        Badge badge = TwitchChatMod.BADGES.get(event.getChannel().getId(), name);
+        Badge badge = TwitchChatMod.BADGES.get(event.getChannel().getId(), name, version);
         badges.add(badge);
       } catch (IllegalArgumentException ignored) {}
     });
@@ -118,7 +118,7 @@ public class FormatMessage {
 
     Badge badge;
     try {
-      badge = TwitchChatMod.BADGES.get("@" + user.getLogin());
+      badge = TwitchChatMod.BADGES.get("@" + user.getLogin(), "");
     } catch (IllegalArgumentException e) {
       try {
         badge = new Badge(user);
