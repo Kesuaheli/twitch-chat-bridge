@@ -1,5 +1,6 @@
 package de.kesuaheli.twitchchatbridge;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import de.kesuaheli.twitchchatbridge.badge.BadgeSet;
 import de.kesuaheli.twitchchatbridge.commands.TwitchBaseCommand;
 import de.kesuaheli.twitchchatbridge.config.ModConfigFile;
@@ -65,7 +66,11 @@ public class TwitchChatMod implements ModInitializer {
         return;
       }
     }
-    MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(message);
+    if (RenderSystem.isOnRenderThread()) {
+      MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(message);
+    } else {
+      MinecraftClient.getInstance().executeSync(() -> MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(message));
+    }
   }
 
   public static void addNotification(MutableText message) {
@@ -73,6 +78,10 @@ public class TwitchChatMod implements ModInitializer {
       return;
     }
 
-    MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(message.formatted(Formatting.DARK_GRAY));
+    if (RenderSystem.isOnRenderThread()) {
+      MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(message.formatted(Formatting.DARK_GRAY));
+    } else {
+      MinecraftClient.getInstance().executeSync(() -> MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(message.formatted(Formatting.DARK_GRAY)));
+    }
   }
 }
