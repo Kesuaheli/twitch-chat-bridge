@@ -17,6 +17,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class PronounDBAPI {
@@ -30,6 +31,18 @@ public class PronounDBAPI {
 	}
 
 	public static @NotNull Map<String, @Nullable PronounSet> lookup(@NotNull Platform platform, @NotNull String ...ids) {
+		PronounCache.CacheSplit cacheSplit = PronounCache.split(platform, ids);
+		if (cacheSplit.uncached.isEmpty()) return cacheSplit.cached;
+
+		Map<String, @Nullable PronounSet> lookupResult = lookupRequest(platform, cacheSplit.uncached);
+		if (lookupResult.isEmpty()) return cacheSplit.cached;
+		if (cacheSplit.cached.isEmpty()) return lookupResult;
+
+		// both lookup result and cache have values, easier to get new cache
+		return PronounCache.get(platform, ids);
+	}
+
+	private static @NotNull Map<String, @Nullable PronounSet> lookupRequest(@NotNull Platform platform, @NotNull List<String> ids) {
 		URI uri = URI.create(String.format(LOOKUP_FORMAT,
 			platform,
 			String.join(",", ids)
@@ -64,9 +77,12 @@ public class PronounDBAPI {
 		HashMap<String, PronounSet> out = new HashMap<>();
 		for (String id : ids) {
 			if (!json.has(id)) {
+				PronounCache.store(platform, id);
 				continue;
 			}
-			out.put(id, new PronounSet(json.getAsJsonObject(id)));
+			PronounSet pronouns = new PronounSet(json.getAsJsonObject(id));
+			out.put(id, pronouns);
+			PronounCache.store(platform, id, pronouns);
 		}
 		return out;
 	}
