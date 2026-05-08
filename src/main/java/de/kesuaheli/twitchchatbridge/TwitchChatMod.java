@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 public class TwitchChatMod implements ModInitializer {
   public final static Logger LOGGER = LoggerFactory.getLogger(TwitchChatMod.class);
+  public static final String VERSION = FabricLoader.getInstance().getModContainer("twitchchatbridge").orElseThrow().getMetadata().getVersion().getFriendlyString();
   public static ModConfig CONFIG;
   public static Bot bot;
   public static final BadgeSet BADGES = new BadgeSet();
