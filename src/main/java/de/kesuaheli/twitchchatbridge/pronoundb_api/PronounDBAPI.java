@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 public class PronounDBAPI {
-	private static final String BASE_URL = "https://pronoundb/api/v2";
+	private static final String BASE_URL = "https://pronoundb.org/api/v2";
 	private static final String LOOKUP_FORMAT = BASE_URL+"/lookup?platform=%s&ids=%s";
 	private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
 	private static final String USER_AGENT = "Twitch-Chat-Bridge/"+TwitchChatMod.VERSION+" Minecraft/"+ Minecraft.getInstance().getLaunchedVersion();
