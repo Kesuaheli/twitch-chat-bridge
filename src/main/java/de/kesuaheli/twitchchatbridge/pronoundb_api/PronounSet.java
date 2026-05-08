@@ -14,10 +14,12 @@ public class PronounSet {
 
 	public PronounSet(@NotNull JsonObject json) {
 		this.pronouns = HashMap.newHashMap(json.size());
+		JsonObject sets = json.getAsJsonObject("sets");
+		if (sets == null) return;
 
-		for (String jsonLocale : json.keySet()) {
+		for (String jsonLocale : sets.keySet()) {
 			Locale locale = Locale.fromJSONName(jsonLocale);
-			List<Pronoun> pronounList = json.getAsJsonArray(jsonLocale)
+			List<Pronoun> pronounList = sets.getAsJsonArray(jsonLocale)
 					.asList()
 					.stream()
 					.map(jsonPronoun ->  Pronoun.fromString(jsonPronoun.getAsString(), locale))
