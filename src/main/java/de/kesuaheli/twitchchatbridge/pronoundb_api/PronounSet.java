@@ -11,9 +11,11 @@ import java.util.stream.Collectors;
 
 public class PronounSet {
 	private final Map<Locale, List<Pronoun>> pronouns;
+	public final @NotNull Decoration decoration;
 
 	public PronounSet(@NotNull JsonObject json) {
 		this.pronouns = HashMap.newHashMap(json.size());
+		this.decoration = Decoration.fromJsonObject(json);
 		JsonObject sets = json.getAsJsonObject("sets");
 		if (sets == null) return;
 
