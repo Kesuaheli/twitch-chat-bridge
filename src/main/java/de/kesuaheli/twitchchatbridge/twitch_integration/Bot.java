@@ -212,7 +212,14 @@ public class Bot {
     if (this.pendingBadges == null ) return;
 
     this.userBadges = new ArrayList<>();
+    final boolean[] isFounder = {false};
     this.pendingBadges.forEach((name, version) -> {
+      if (isFounder[0] && name.equals("subscriber")) {
+        return;
+      } else if (name.equals("founder")) {
+        isFounder[0] = true;
+        this.userBadges.removeIf(b -> b.getName().equals("subscriber"));
+      }
       try {
         Badge badge = TwitchChatMod.BADGES.get(this.channelID, name, version);
         this.userBadges.add(badge);
