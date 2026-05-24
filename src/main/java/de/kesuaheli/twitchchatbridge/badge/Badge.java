@@ -313,11 +313,19 @@ public class Badge {
 
         final String regex = startingPath + "/(?:global|channel/(?<channelName>[a-z0-1_]+))/(?<badgeName>[a-z0-1_]+)\\.png";
         final Pattern pattern = Pattern.compile(regex);
-        resources.forEach((identifier, resource) -> {
+        for (Identifier identifier : resources.keySet()) {
             if (!identifier.getNamespace().equals(BadgeFont.IDENTIFIER.getNamespace())) return;
             Matcher matcher = pattern.matcher(identifier.getPath());
             if (!matcher.matches()) return;
 
+            // TODO: implement new RP support for badges
+            TwitchChatMod.LOGGER.error("resource pack support is currently not working.");
+            TwitchChatMod.addNotification(Component.literal("")
+                .append(Component.literal("Twitch Chat Bridge Warning: ").withStyle(ChatFormatting.RED))
+                .append("You tried to load a resource pack with badge override textures, but these are currently not working due to recent structural changes for badges in version 0.20.0b!")
+            );
+            return;
+            /*
             String channelID = null;
             try {
                 String channelName = matcher.group("channelName");
@@ -332,7 +340,7 @@ public class Badge {
 
             NativeImage image;
             try {
-                image = NativeImage.read(resource.open());
+                image = NativeImage.read(resources.get(identifier).open());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -345,7 +353,8 @@ public class Badge {
             } else {
                 TwitchChatMod.BADGES.add(channelID, badge);
             }
-        });
+            */
+        }
     }
 
     public class ChannelOverride {
