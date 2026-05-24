@@ -1,5 +1,5 @@
 plugins {
-	id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
+	id 'net.fabricmc.fabric-loom' version "${loom_version}"
 	id 'maven-publish'
 }
 
@@ -24,22 +24,22 @@ loom {
 
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings loom.officialMojangMappings()
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
-	annotationProcessor modImplementation("io.wispforest:owo-lib:${project.owo_config_version}")
+	implementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
+	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+	implementation "com.terraformersmc:modmenu:${project.modmenu_version}"
+	annotationProcessor implementation("io.wispforest:owo-lib:${project.owo_config_version}")
 	include("io.wispforest:owo-sentinel:${project.owo_config_version}")
 
-	modImplementation("com.github.twitch4j:twitch4j-fabric:${project.twitch4j_version}")
+	implementation("com.github.twitch4j:twitch4j-fabric:${project.twitch4j_version}")
 	include "commons-logging:commons-logging:1.2"
 }
 
 Map<String, String> replaceProperties = [
 		"mod_version": project.mod_version,
 		"minecraft_version": project.minecraft_version,
-		"loader_version": project.loader_version,
+		"fabric_loader_version": project.fabric_loader_version,
 
 		"owo_config_version": project.owo_config_version,
 		"twitch4j_version": project.twitch4j_version,
@@ -62,8 +62,8 @@ tasks.withType(JavaCompile).configureEach {
 	// If Javadoc is generated, this must be specified in that task too.
 	it.options.encoding = "UTF-8"
 
-	// Minecraft now uses Java 21.
-	it.options.release = 21
+	// Minecraft now uses Java 25.
+	it.options.release = 25
 }
 
 java {
@@ -72,8 +72,8 @@ java {
 	// If you remove this line, sources will not be generated.
 	withSourcesJar()
 
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
 }
 
 jar {
