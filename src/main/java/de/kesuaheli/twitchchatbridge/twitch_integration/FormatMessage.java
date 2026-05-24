@@ -47,9 +47,16 @@ public class FormatMessage {
     }
 
     List<Badge> badges = new ArrayList<>();
+    final boolean[] isFounder = {false};
     event.getMessageEvent().getBadges().forEach((name,  version) -> {
+      if (isFounder[0] && name.equals("subscriber")) {
+        return;
+      } else if (name.equals("founder")) {
+        isFounder[0] = true;
+        badges.removeIf(b -> b.getName().equals("subscriber"));
+      }
       try {
-        Badge badge = TwitchChatMod.BADGES.get(event.getChannel().getId(), name);
+        Badge badge = TwitchChatMod.BADGES.get(event.getChannel().getId(), name, version);
         badges.add(badge);
       } catch (IllegalArgumentException ignored) {}
     });
@@ -118,7 +125,7 @@ public class FormatMessage {
 
     Badge badge;
     try {
-      badge = TwitchChatMod.BADGES.get("@" + user.getLogin());
+      badge = TwitchChatMod.BADGES.get("@" + user.getLogin(), "");
     } catch (IllegalArgumentException e) {
       try {
         badge = new Badge(user);

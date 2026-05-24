@@ -1,7 +1,6 @@
 package de.kesuaheli.twitchchatbridge.badge;
 
 import com.github.twitch4j.helix.domain.ChatBadge;
-import com.github.twitch4j.helix.domain.ChatBadgeSet;
 import com.github.twitch4j.helix.domain.User;
 import com.mojang.blaze3d.platform.NativeImage;
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
@@ -30,6 +29,7 @@ import java.util.regex.Pattern;
 
 public class Badge {
     private final String name;
+    private final String version;
     private MutableComponent displayName;
     private Component description;
     Map<String, ChannelOverride> channelOverrides = new HashMap<>();
@@ -40,23 +40,24 @@ public class Badge {
     /**
      * An empty badge with a name set to "" and null image.
      */
-    public static final Badge EMPTY = new Badge("", null);
+    public static final Badge EMPTY = new Badge("", "", null);
 
-    Badge(String name, NativeImage image) {
+    Badge(String name, String version, NativeImage image) {
         this.name = name;
+        this.version = version;
         this.image = image;
     }
 
-    public Badge(ChatBadgeSet chatBadgeSet) throws IOException, URISyntaxException {
-        this.name = chatBadgeSet.getSetId();
-        ChatBadge lastVersion = chatBadgeSet.getVersions().getLast();
-        this.displayName = Component.literal(lastVersion.getTitle());
-        setDescription(lastVersion.getDescription());
+    public Badge(String name, ChatBadge badgeVersion) throws IOException, URISyntaxException {
+        this.name = name;
+        this.version = badgeVersion.getId();
+        this.displayName = Component.literal(badgeVersion.getTitle());
+        setDescription(badgeVersion.getDescription());
 
         String[] tryURLs = {
-            lastVersion.getLargeImageUrl(),
-            lastVersion.getMediumImageUrl(),
-            lastVersion.getSmallImageUrl(),
+            badgeVersion.getLargeImageUrl(),
+            badgeVersion.getMediumImageUrl(),
+            badgeVersion.getSmallImageUrl(),
         };
         for (int i = 0; i < tryURLs.length; i++) {
             if (i != 0) {
@@ -82,6 +83,7 @@ public class Badge {
 
     public Badge(User user) throws IOException, URISyntaxException {
         this.name = "@"+user.getLogin();
+        this.version = "";
         this.displayName = Component.literal(user.getDisplayName());
         setDescription(user.getDescription());
 
@@ -106,6 +108,7 @@ public class Badge {
      */
     Badge(Badge badge) {
         this.name = badge.name;
+        this.version = badge.name;
         this.displayName = badge.displayName;
         this.description = badge.description;
         this.channelOverrides = badge.channelOverrides;
@@ -119,6 +122,13 @@ public class Badge {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * @return The version of the badge
+     */
+    public String getVersion() {
+        return version;
     }
 
     /**
@@ -303,11 +313,19 @@ public class Badge {
 
         final String regex = startingPath + "/(?:global|channel/(?<channelName>[a-z0-1_]+))/(?<badgeName>[a-z0-1_]+)\\.png";
         final Pattern pattern = Pattern.compile(regex);
-        resources.forEach((identifier, resource) -> {
+        for (Identifier identifier : resources.keySet()) {
             if (!identifier.getNamespace().equals(BadgeFont.IDENTIFIER.getNamespace())) return;
             Matcher matcher = pattern.matcher(identifier.getPath());
             if (!matcher.matches()) return;
 
+            // TODO: implement new RP support for badges
+            TwitchChatMod.LOGGER.error("resource pack support is currently not working.");
+            TwitchChatMod.addNotification(Component.literal("")
+                .append(Component.literal("Twitch Chat Bridge Warning: ").withStyle(ChatFormatting.RED))
+                .append("You tried to load a resource pack with badge override textures, but these are currently not working due to recent structural changes for badges in version 0.20.0b!")
+            );
+            return;
+            /*
             String channelID = null;
             try {
                 String channelName = matcher.group("channelName");
@@ -322,20 +340,21 @@ public class Badge {
 
             NativeImage image;
             try {
-                image = NativeImage.read(resource.open());
+                image = NativeImage.read(resources.get(identifier).open());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
 
             String name = matcher.group("badgeName");
-            Badge badge = new Badge(name, null);
+            Badge badge = new Badge(name, "", null);
             badge.resourcePackOverrideImage = image;
             if (channelID == null) {
                 TwitchChatMod.BADGES.add(badge);
             } else {
                 TwitchChatMod.BADGES.add(channelID, badge);
             }
-        });
+            */
+        }
     }
 
     public class ChannelOverride {
