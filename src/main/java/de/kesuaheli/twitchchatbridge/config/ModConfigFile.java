@@ -23,6 +23,8 @@ public class ModConfigFile {
   public String channel = "";
   @Comment("Whether to automatically enable the connection to twitch when Minecraft starts")
   public boolean autoConnect = true;
+  @Comment("Whether to only send messages to twitch and disable receiving messages from twitch")
+  public boolean printMessagesInChat = true;
   @Comment("The chat prefix to send a message to twitch")
   @PredicateConstraint("prefixConstraintFunction")
   public String prefix = ":";

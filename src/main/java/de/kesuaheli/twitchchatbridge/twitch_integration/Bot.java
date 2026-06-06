@@ -78,6 +78,7 @@ public class Bot {
   }
 
   public void onMessage(ChannelMessageEvent event) {
+    if (!TwitchChatMod.CONFIG.printMessagesInChat()) return;
     FormatMessage.formatAndSend(event, false);
   }
 
@@ -112,6 +113,7 @@ public class Bot {
 
   // Handle /me
   public void onAction(ChannelMessageActionEvent event) {
+    if (!TwitchChatMod.CONFIG.printMessagesInChat()) return;
     FormatMessage.formatAndSend(event, true);
   }
 
