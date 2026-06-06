@@ -40,11 +40,19 @@
   "text.twitchchat.command.enable.select_channel": "You won't connect to a channel because you haven't selected any. You can select a channel with /twitch watch [channel]",
   "text.twitchchat.command.enable.connecting": "Connecting...",
 
+  "text.twitchchat.command.watch": "Currently watching channel '%s'",
+  "text.twitchchat.command.watch.no_channel": "Currently not watching any channel.",
   "text.twitchchat.command.watch.switching": "Switching channels to '%s'...",
   "text.twitchchat.command.watch.connect_on_enable": "The mod will connect to '%s' as soon as you enable it.",
 
+  "text.twitchchat.command.broadcast.currently_enabled": "Broadcasting is currently enabled",
+  "text.twitchchat.command.broadcast.currently_disabled": "Broadcasting is currently disabled",
   "text.twitchchat.command.broadcast.enabled": "Broadcasting enabled",
   "text.twitchchat.command.broadcast.disabled": "Broadcasting disabled",
+
+  "text.twitchchat.command.config.help": "- 'reload': Reload the config from file into the game.\n- 'save': Save the current game config back to the config file.",
+  "text.twitchchat.command.config.reload": "Config reloaded from file!",
+  "text.twitchchat.command.config.save": "Config saved back file!",
 
   "text.twitchchat.chat.integration_disabled": "Twitch integration is not enabled, to enable it do /twitch enable.",
   "text.twitchchat.bot.connected": "Connected to channel '%s'",

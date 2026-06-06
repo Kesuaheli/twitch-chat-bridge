@@ -13,10 +13,19 @@ import static de.kesuaheli.twitchchatbridge.TwitchChatMod.CONFIG;
 public class TwitchBroadcastCommand extends LiteralArgumentBuilder<FabricClientCommandSource> {
   TwitchBroadcastCommand() {
     super("broadcast");
+    executes(this::executeGet);
     then(ClientCommandManager.argument("enabled", BoolArgumentType.bool())
       .executes(this::execute)
     );
-    executes(this::execute);
+  }
+
+  private int executeGet(CommandContext<FabricClientCommandSource> ctx) {
+    if (CONFIG.broadcast()) {
+      ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.broadcast.currently_enabled"));
+    } else {
+      ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.broadcast.currently_disabled"));
+    }
+    return 1;
   }
 
   private int execute(CommandContext<FabricClientCommandSource> ctx) {

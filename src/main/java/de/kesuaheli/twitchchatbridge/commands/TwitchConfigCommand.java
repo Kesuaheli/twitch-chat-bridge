@@ -15,19 +15,25 @@ import static de.kesuaheli.twitchchatbridge.TwitchChatMod.CONFIG;
 public class TwitchConfigCommand extends LiteralArgumentBuilder<FabricClientCommandSource> {
   TwitchConfigCommand() {
     super("config");
+    executes(this::executeHelp);
     then(ClientCommandManager.argument("option", new EnumArgumentHelper<>(ConfigOption.values()))
       .executes(ctx -> ctx.getArgument("option", ConfigOption.class).execute(ctx))
     );
   }
 
+  private int executeHelp(CommandContext<FabricClientCommandSource> ctx) {
+    ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.config.help"));
+    return 1;
+  }
+
   public enum ConfigOption implements StringRepresentable {
     RELOAD(ctx -> {
       CONFIG.load();
-      ctx.getSource().sendFeedback(Component.literal("config reloaded"));
+      ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.config.reload"));
     }),
     SAVE(ctx -> {
       CONFIG.save();
-      ctx.getSource().sendFeedback(Component.literal("config saved"));
+      ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.config.save"));
     });
 
     private final Consumer<CommandContext<FabricClientCommandSource>> consumer;
