@@ -17,6 +17,8 @@
   "text.config.twitchchatbridge/config.option.broadcastPrefix.tooltip": "This is going to be added to the beginning of messages broadcasted to the server",
   "text.config.twitchchatbridge/config.option.avatarBadge": "Always show channel avatar badge",
   "text.config.twitchchatbridge/config.option.avatarBadge.tooltip": "Always shows the user avatar of the channel the message was posted in.\nWhen disabled, its only shown when the channel is in shared-chat mode.",
+  "text.config.twitchchatbridge/config.option.showPronounsInline": "Show users pronouns inline",
+  "text.config.twitchchatbridge/config.option.showPronounsInline.tooltip": "Show the users pronouns from PronounDB.org inline in the chat if enabled.\nOtherwise only show it as hover info on the username",
   "text.config.twitchchatbridge/config.option.ignoreList": "Ignore list",
   "text.config.twitchchatbridge/config.option.ignoreList.tooltip": "Messages from users in this list won't be displayed",
   "text.config.twitchchatbridge/config.option.twitchWatchSuggestions": "Suggestions for /twitch watch",

@@ -41,6 +41,8 @@ public class ModConfigFile {
   public String broadcastPrefix = "[Twitch] ";
   @Comment("Whether to always show the channels user avatar as badge")
   public boolean avatarBadge = false;
+  @Comment("Whether to show the users pronouns inline or only when hovering their username")
+  public boolean showPronounsInline = true;
   @Comment("A list of username to ignore messages form i.e. their messages don't show up in-game")
   public List<String> ignoreList = new ArrayList<>();
   @Comment("Whether to use tab completion for the \"/twitch watch <channel>\" command")

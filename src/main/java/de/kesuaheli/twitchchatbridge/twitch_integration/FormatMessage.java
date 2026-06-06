@@ -5,13 +5,20 @@ import com.github.twitch4j.helix.domain.User;
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
 import de.kesuaheli.twitchchatbridge.badge.Badge;
 import de.kesuaheli.twitchchatbridge.badge.BadgeFont;
+import de.kesuaheli.twitchchatbridge.pronoundb_api.Locale;
+import de.kesuaheli.twitchchatbridge.pronoundb_api.Platform;
+import de.kesuaheli.twitchchatbridge.pronoundb_api.PronounDBAPI;
+import de.kesuaheli.twitchchatbridge.pronoundb_api.PronounSet;
 import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,11 +38,11 @@ public class FormatMessage {
   }
 
   public static void formatAndSend(String message, boolean isActionMessage) {
-    formatAndSend(new Date(), TwitchChatMod.bot.getUserBadges(), TwitchChatMod.bot.getUsername(), message, isActionMessage);
+    formatAndSend(new Date(), TwitchChatMod.bot.getUserBadges(), TwitchChatMod.bot.getUsername(), TwitchChatMod.bot.getUserID(), message, isActionMessage);
   }
 
-  public static void formatAndSend(Date time, List<Badge> badges, String username, String message, boolean isActionMessage) {
-    Component formattedMessage = formatMessage(time, getUserAvatarBadge(CONFIG.avatarBadge() ? TwitchChatMod.bot.getChannelID() : null), badges, username, message, isActionMessage);
+  public static void formatAndSend(Date time, List<Badge> badges, String username, String userID, String message, boolean isActionMessage) {
+    Component formattedMessage = formatMessage(time, getUserAvatarBadge(CONFIG.avatarBadge() ? TwitchChatMod.bot.getChannelID() : null), badges, username, userID, message, isActionMessage);
 
     TwitchChatMod.addTwitchMessage(formattedMessage);
   }
@@ -70,12 +77,13 @@ public class FormatMessage {
         getUserAvatarBadge(event.getSourceChannelId().orElse(CONFIG.avatarBadge() ? event.getMessageEvent().getChannelId() : null)),
         badges,
         nick,
+        event.getMessageEvent().getUserId(),
         event.getMessage(),
         isActionMessage
     );
   }
 
-  public static @NotNull Component formatMessage(Date time, Component avatar, List<Badge> badges, String username, String message, boolean isActionMessage) {
+  public static @NotNull Component formatMessage(Date time, Component avatar, List<Badge> badges, String username, String userID, String message, boolean isActionMessage) {
     if (!TwitchChatMod.bot.isFormattingColorCached(username)) {
       TwitchChatMod.bot.putFormattingColor(username);
     }
@@ -88,8 +96,19 @@ public class FormatMessage {
     text.append(avatar);
 
     MutableComponent usernameText = Component.literal("");
+    MutableComponent pronounText = appendPronouns(userID);
+    if (pronounText != null && CONFIG.showPronounsInline()) {
+      usernameText.append(pronounText);
+    }
     badges.forEach(badge -> usernameText.append(badge.toText()));
-    usernameText.append(Component.literal(username).withStyle(style -> style.withColor(TwitchChatMod.bot.getFormattingColor(username))));
+    usernameText.append(Component.literal(username).withStyle(style -> {
+      if (pronounText != null) {
+        style = style.withHoverEvent(pronounText.getStyle().getHoverEvent());
+      } else {
+        style = style.withHoverEvent(new HoverEvent.ShowText(Component.literal("This user didn't specify pronouns on PronounDB.org yet.")));
+      }
+      return style.withColor(TwitchChatMod.bot.getFormattingColor(username));
+	}));
 
     message = sanitiseMessage(message);
     if (isActionMessage) {
@@ -101,6 +120,31 @@ public class FormatMessage {
     }
 
     return text;
+  }
+
+  private static MutableComponent appendPronouns(String userID) {
+    PronounSet pronouns = PronounDBAPI.lookup(Platform.TWITCH, userID);
+    if (pronouns == null) return null;
+
+    String pronounShort = pronouns.Short(Locale.EN);
+    if (pronounShort == null) return null;
+    String pronounNormal = pronouns.Normal(Locale.EN);
+    if (pronounNormal == null) pronounNormal = pronounShort;
+    String pronounLong = pronouns.Long(Locale.EN);
+
+    MutableComponent pronounText = Component.literal("["+pronounShort+"]");
+    pronounText = pronouns.decoration.decor(pronounText);
+
+    MutableComponent description = Component.literal("");
+    description.append(Component.literal(pronounNormal).withStyle(ChatFormatting.DARK_GRAY));
+    if (pronounLong != null) {
+      description.append("\n").append(pronounLong);
+    }
+    pronounText.withStyle(style -> style
+      .withHoverEvent(new HoverEvent.ShowText(description))
+      .withClickEvent(new ClickEvent.OpenUrl(URI.create("https://pronoundb.org")))
+    );
+    return pronounText;
   }
 
   private static String sanitiseMessage(String message) {
@@ -130,12 +174,12 @@ public class FormatMessage {
       try {
         badge = new Badge(user);
       } catch (URISyntaxException | IOException ex) {
-        TwitchChatMod.LOGGER.error("Failed to resolve user avatar badge for @{}", user.getLogin());
+        LOGGER.error("Failed to resolve user avatar badge for @{}", user.getLogin());
         return Component.empty();
       }
       TwitchChatMod.BADGES.add(badge);
       BadgeFont.reload();
-      TwitchChatMod.LOGGER.info("Added Avatar badge for user {} ({})", user.getDisplayName(), user.getLogin());
+      LOGGER.info("Added Avatar badge for user {} ({})", user.getDisplayName(), user.getLogin());
     }
     return badge.toText();
   }
