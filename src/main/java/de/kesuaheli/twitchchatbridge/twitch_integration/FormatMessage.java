@@ -150,7 +150,7 @@ public class FormatMessage {
   private static String sanitiseMessage(String message) {
     return message
       .replaceAll("§", "")
-      .replaceAll("\uFFA0", "")
+      .replaceAll("\uFFA0|\u034F", "")
       .trim();
   }
 
