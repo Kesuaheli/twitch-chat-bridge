@@ -16,6 +16,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.packs.PackType;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,15 +76,46 @@ public class TwitchChatMod implements ModInitializer {
     }
   }
 
+  /**
+   * Shows a formatted error message in the users chat.
+   *
+   * @param message the translation key for the message
+   * @param details the details
+   */
+  public static void addErrorMessage(String message, MutableComponent details) {
+    addErrorMessage(Component.translatable(message), details);
+  }
+
+  /**
+   * Shows a formatted error message in the users chat.
+   *
+   * @param message the message
+   * @param details the details
+   */
+  public static void addErrorMessage(MutableComponent message, @Nullable MutableComponent details) {
+    message = Component.literal("[ERROR] ")
+      .append(message)
+      .withStyle(ChatFormatting.RED);
+    if (details != null && !details.toString().isEmpty()) {
+      message.append(" ").append(details.withStyle(ChatFormatting.WHITE));
+    }
+
+    TwitchChatMod.addNotification(message);
+  }
+
   public static void addNotification(MutableComponent message) {
     if (Minecraft.getInstance().player == null) {
       return;
     }
 
+    if (message.getStyle().getColor() == null) {
+      message.withStyle(ChatFormatting.DARK_GRAY);
+    }
+
     if (RenderSystem.isOnRenderThread()) {
-      Minecraft.getInstance().gui.getChat().addMessage(message.withStyle(ChatFormatting.DARK_GRAY));
+      Minecraft.getInstance().gui.getChat().addMessage(message);
     } else {
-      Minecraft.getInstance().executeIfPossible(() -> Minecraft.getInstance().gui.getChat().addMessage(message.withStyle(ChatFormatting.DARK_GRAY)));
+      Minecraft.getInstance().executeIfPossible(() -> Minecraft.getInstance().gui.getChat().addMessage(message));
     }
   }
 }
