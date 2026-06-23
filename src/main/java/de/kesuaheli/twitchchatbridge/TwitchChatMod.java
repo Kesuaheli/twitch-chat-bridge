@@ -65,9 +65,9 @@ public class TwitchChatMod implements ModInitializer {
     }
 
     if (RenderSystem.isOnRenderThread()) {
-      Minecraft.getInstance().gui.getChat().addClientSystemMessage(message);
+      Minecraft.getInstance().gui.hud.getChat().addClientSystemMessage(message);
     } else {
-      Minecraft.getInstance().executeIfPossible(() -> Minecraft.getInstance().gui.getChat().addClientSystemMessage(message));
+      Minecraft.getInstance().executeIfPossible(() -> Minecraft.getInstance().gui.hud.getChat().addClientSystemMessage(message));
     }
   }
 
@@ -108,9 +108,9 @@ public class TwitchChatMod implements ModInitializer {
     }
 
     if (RenderSystem.isOnRenderThread()) {
-      Minecraft.getInstance().gui.getChat().addClientSystemMessage(message);
+      Minecraft.getInstance().gui.hud.getChat().addClientSystemMessage(message);
     } else {
-      Minecraft.getInstance().executeIfPossible(() -> Minecraft.getInstance().gui.getChat().addClientSystemMessage(message));
+      Minecraft.getInstance().executeIfPossible(() -> Minecraft.getInstance().gui.hud.getChat().addClientSystemMessage(message));
     }
   }
 }
