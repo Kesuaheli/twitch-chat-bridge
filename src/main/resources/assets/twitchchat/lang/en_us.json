@@ -57,6 +57,8 @@
   "text.twitchchat.command.config.save": "Config saved back file!",
 
   "text.twitchchat.chat.integration_disabled": "Twitch integration is not enabled, to enable it do /twitch enable.",
+  "text.twitchchat.chat.invalid_token": "Missing token scopes or invalid token given.",
+  "text.twitchchat.chat.invalid_token.scope_hint": "You need a token with at least the following scopes: %s",
   "text.twitchchat.bot.connected": "Connected to channel '%s'",
   "text.twitchchat.bot.kicked": "Kicked from the current channel because: '%s'"
 }

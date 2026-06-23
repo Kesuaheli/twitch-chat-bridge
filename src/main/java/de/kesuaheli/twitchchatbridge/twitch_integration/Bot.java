@@ -4,11 +4,13 @@ import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
+import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.chat.events.channel.*;
 import com.github.twitch4j.helix.domain.User;
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
 import de.kesuaheli.twitchchatbridge.badge.Badge;
 import de.kesuaheli.twitchchatbridge.badge.BadgeFont;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +23,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Bot {
+  public static List<String> REQUIRED_SCOPES = List.of("chat:read", "chat:edit");
+
   private TwitchClient twitchClient;
   private final TwitchClientBuilder twitchClientBuilder;
   private String username;
@@ -48,9 +52,29 @@ public class Bot {
     this.myExecutor = Executors.newCachedThreadPool();
   }
 
+  private boolean checkToken() {
+    Optional<OAuth2Credential> credentialInformation = new TwitchIdentityProvider(null, null, null)
+            .getAdditionalCredentialInformation(twitchClientBuilder.getChatAccount());
+    if (credentialInformation.isEmpty()) {
+      return false;
+    }
+    HashSet<String> tokenScopes = new HashSet<>(credentialInformation.get().getScopes());
+    return tokenScopes.containsAll(REQUIRED_SCOPES);
+  }
+
   public void start() {
-    System.out.println("TWITCH BOT STARTED");
     myExecutor.execute(() -> {
+      if (!this.checkToken()) {
+        if (Minecraft.getInstance().player == null) {
+          TwitchChatMod.LOGGER.error("Failed to start Twitch connection: invalid or unsufficient token given, need at least the scopes '{}'", REQUIRED_SCOPES);
+        } else {
+          TwitchChatMod.addErrorMessage("text.twitchchat.chat.invalid_token",
+            Component.translatable("text.twitchchat.chat.invalid_token.scope_hint", REQUIRED_SCOPES)
+          );
+        }
+        return;
+      }
+
       isConnected = true;
       twitchClient = twitchClientBuilder.build();
       EventManager eventManager = twitchClient.getEventManager();
