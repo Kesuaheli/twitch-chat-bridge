@@ -4,7 +4,7 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.network.chat.Component;
 
@@ -13,19 +13,10 @@ import static de.kesuaheli.twitchchatbridge.TwitchChatMod.CONFIG;
 public class TwitchBroadcastCommand extends LiteralArgumentBuilder<FabricClientCommandSource> {
   TwitchBroadcastCommand() {
     super("broadcast");
-    executes(this::executeGet);
-    then(ClientCommandManager.argument("enabled", BoolArgumentType.bool())
+    then(ClientCommands.argument("enabled", BoolArgumentType.bool())
       .executes(this::execute)
     );
-  }
-
-  private int executeGet(CommandContext<FabricClientCommandSource> ctx) {
-    if (CONFIG.broadcast()) {
-      ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.broadcast.currently_enabled"));
-    } else {
-      ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.broadcast.currently_disabled"));
-    }
-    return 1;
+    executes(this::execute);
   }
 
   private int execute(CommandContext<FabricClientCommandSource> ctx) {
