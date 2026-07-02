@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.resource.ReloadableResourceManagerImpl;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.profiler.Profiler;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -42,6 +43,8 @@ public class TwitchChatResourceReloadListener implements IdentifiableResourceRel
    *
    * @param synchronizer    the synchronizer
    * @param manager         the resource manager
+   * @param prepareProfiler the prepare profiler
+   * @param applyProfiler   the apply profiler
    * @param prepareExecutor the prepare executor
    * @param applyExecutor   the apply executor
    * @return a future for the reload
@@ -49,7 +52,7 @@ public class TwitchChatResourceReloadListener implements IdentifiableResourceRel
    * CompletableFuture, List)
    */
   @Override
-  public CompletableFuture<Void> reload(Synchronizer synchronizer, ResourceManager manager, Executor prepareExecutor, Executor applyExecutor) {
+  public CompletableFuture<Void> reload(Synchronizer synchronizer, ResourceManager manager, Profiler prepareProfiler, Profiler applyProfiler, Executor prepareExecutor, Executor applyExecutor) {
 
     CompletableFuture<Void> preparedAction = CompletableFuture.supplyAsync(() -> {
       TwitchChatMod.BADGES.clearResourcePackOverrides();

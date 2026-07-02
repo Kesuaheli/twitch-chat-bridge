@@ -28,7 +28,7 @@
   "accessWidener": "twitchchat.accesswidener",
 
   "depends": {
-    "minecraft": ">=1.21.2 <=${minecraft_version}",
+    "minecraft": ">=1.21 <=${minecraft_version}",
     "fabricloader": "*",
     "fabric": "*",
     "owo-lib": ">=${owo_config_version}",
