@@ -105,7 +105,7 @@ public class FormatMessage {
       if (pronounText != null) {
         style = style.withHoverEvent(pronounText.getStyle().getHoverEvent());
       } else {
-        style = style.withHoverEvent(new HoverEvent.ShowText(Text.literal("This user didn't specify pronouns on PronounDB.org yet.")));
+        style = style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("This user didn't specify pronouns on PronounDB.org yet.")));
       }
       return style.withColor(TwitchChatMod.bot.getFormattingColor(username));
 	}));
@@ -141,8 +141,8 @@ public class FormatMessage {
       description.append("\n").append(pronounLong);
     }
     pronounText.styled(style -> style
-      .withHoverEvent(new HoverEvent.ShowText(description))
-      .withClickEvent(new ClickEvent.OpenUrl(URI.create("https://pronoundb.org")))
+      .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, description))
+      .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://pronoundb.org"))
     );
     return pronounText;
   }
