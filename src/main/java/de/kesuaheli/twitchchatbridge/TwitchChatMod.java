@@ -6,10 +6,9 @@ import de.kesuaheli.twitchchatbridge.commands.TwitchBaseCommand;
 import de.kesuaheli.twitchchatbridge.config.ModConfigFile;
 import de.kesuaheli.twitchchatbridge.config.ModConfig;
 import de.kesuaheli.twitchchatbridge.twitch_integration.Bot;
-import de.kesuaheli.twitchchatbridge.util.Constants;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
-import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.resource.ResourceType;
@@ -38,8 +37,8 @@ public class TwitchChatMod implements ModInitializer {
       dispatcher.register(new TwitchBaseCommand()));
 
     // Register reload listener
-    ResourceLoader.get(ResourceType.CLIENT_RESOURCES)
-        .registerReloader(Constants.id("reload"), new TwitchChatResourceReloadListener());
+    ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES)
+        .registerReloadListener(new TwitchChatResourceReloadListener());
 
     if (CONFIG.autoConnect()) {
       autoConnect();

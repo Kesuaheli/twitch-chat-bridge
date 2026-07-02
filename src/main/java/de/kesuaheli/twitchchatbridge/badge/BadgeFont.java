@@ -7,7 +7,6 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.*;
 import net.minecraft.client.texture.TextureManager;
-import net.minecraft.text.StyleSpriteSource;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,7 +14,6 @@ import java.util.List;
 
 public class BadgeFont implements Font {
     public static final Identifier IDENTIFIER = Constants.id("badge");
-    public static final StyleSpriteSource.Font BADGE_FONT = new StyleSpriteSource.Font(BadgeFont.IDENTIFIER);
     public static FontStorage fontStorage;
     public static final List<Font.FontFilterPair> FONT_FILTERS = List.of(new Font.FontFilterPair(new BadgeFont(), FontFilterType.FilterMap.NO_FILTER));
     private static final int BADGE_SIZE = 8;
@@ -53,7 +51,7 @@ public class BadgeFont implements Font {
 
     public static FontStorage newFontStorage(TextureManager textureManager) {
         Badge.loadBadges();
-        fontStorage = new FontStorage(new GlyphBaker(textureManager, IDENTIFIER));
+        fontStorage = new FontStorage(textureManager, IDENTIFIER);
         fontStorage.setFonts(FONT_FILTERS, null);
         return fontStorage;
     }

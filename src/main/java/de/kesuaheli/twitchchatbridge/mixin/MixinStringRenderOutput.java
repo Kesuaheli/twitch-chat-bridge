@@ -5,6 +5,7 @@ import de.kesuaheli.twitchchatbridge.TwitchChatMod;
 import net.minecraft.client.font.FontManager;
 import net.minecraft.client.font.FontStorage;
 import net.minecraft.client.texture.TextureManager;
+import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceReloader;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Final;
@@ -28,8 +29,8 @@ public class MixinStringRenderOutput {
     @Shadow
     private TextureManager textureManager;
 
-    @Inject(method="reload(Lnet/minecraft/resource/ResourceReloader$Store;Ljava/util/concurrent/Executor;Lnet/minecraft/resource/ResourceReloader$Synchronizer;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;", at=@At("RETURN"))
-    public void afterReload(ResourceReloader.Store store, Executor prepareExecutor, ResourceReloader.Synchronizer synchronizer, Executor applyExecutor, CallbackInfoReturnable<CompletableFuture<Void>> ci) {
+    @Inject(method="reload(Lnet/minecraft/resource/ResourceReloader$Synchronizer;Lnet/minecraft/resource/ResourceManager;Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;", at=@At("RETURN"))
+    public void afterReload(ResourceReloader.Synchronizer synchronizer, ResourceManager resourceManager, Executor executor, Executor executor2, CallbackInfoReturnable<CompletableFuture<Void>> ci) {
         ci.getReturnValue().thenRun(() -> {
             fontStorages.put(BadgeFont.IDENTIFIER, BadgeFont.newFontStorage(this.textureManager));
 			TwitchChatMod.LOGGER.info("Added badge font: {}", BadgeFont.IDENTIFIER);

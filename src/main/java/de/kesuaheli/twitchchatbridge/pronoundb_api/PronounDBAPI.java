@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import net.minecraft.client.MinecraftClient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -61,7 +60,7 @@ public class PronounDBAPI {
 		}
 		if (response.statusCode() != 200) {
 			TwitchChatMod.LOGGER.error("PronounDB lookup request: invalid response code '{}'",
-				HttpResponseStatus.valueOf(response.statusCode())
+				response.statusCode()
 			);
 			return Map.of();
 		}

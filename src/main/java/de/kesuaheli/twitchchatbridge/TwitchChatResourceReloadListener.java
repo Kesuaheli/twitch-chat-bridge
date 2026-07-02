@@ -1,8 +1,11 @@
 package de.kesuaheli.twitchchatbridge;
 
 import de.kesuaheli.twitchchatbridge.badge.Badge;
+import de.kesuaheli.twitchchatbridge.util.Constants;
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.resource.ReloadableResourceManagerImpl;
-import net.minecraft.resource.ResourceReloader;
+import net.minecraft.resource.ResourceManager;
+import net.minecraft.util.Identifier;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -11,7 +14,14 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class TwitchChatResourceReloadListener implements ResourceReloader {
+public class TwitchChatResourceReloadListener implements IdentifiableResourceReloadListener {
+  /**
+   * @return The unique identifier of this listener.
+   */
+  @Override
+  public Identifier getFabricId() {
+    return Constants.id("reload");
+  }
 
   /**
    * Performs a reload. Returns a future that is completed when the reload
@@ -30,16 +40,16 @@ public class TwitchChatResourceReloadListener implements ResourceReloader {
    * CompletableFuture.thenAcceptAsync(..., applyExecutor)} for apply actions.
    * In the end, returns the result of {@code thenAcceptAsync}.
    *
-   * @param store           the resource store
-   * @param prepareExecutor the prepare executor
    * @param synchronizer    the synchronizer
+   * @param manager         the resource manager
+   * @param prepareExecutor the prepare executor
    * @param applyExecutor   the apply executor
    * @return a future for the reload
    * @see ReloadableResourceManagerImpl#reload(Executor, Executor,
    * CompletableFuture, List)
    */
   @Override
-  public CompletableFuture<Void> reload(Store store, Executor prepareExecutor, Synchronizer synchronizer, Executor applyExecutor) {
+  public CompletableFuture<Void> reload(Synchronizer synchronizer, ResourceManager manager, Executor prepareExecutor, Executor applyExecutor) {
 
     CompletableFuture<Void> preparedAction = CompletableFuture.supplyAsync(() -> {
       TwitchChatMod.BADGES.clearResourcePackOverrides();

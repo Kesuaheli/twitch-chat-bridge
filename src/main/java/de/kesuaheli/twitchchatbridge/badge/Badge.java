@@ -276,7 +276,7 @@ public class Badge {
         }
         final var finalClickEvent = clickEvent;
         return Text.literal(this.getChar()).styled(style -> style
-            .withFont(BadgeFont.BADGE_FONT)
+            .withFont(BadgeFont.IDENTIFIER)
             .withHoverEvent(this.getHoverEvent())
             .withClickEvent(finalClickEvent)
         );
