@@ -1,8 +1,8 @@
 package de.kesuaheli.twitchchatbridge.pronoundb_api;
 
 import com.google.gson.JsonObject;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TextColor;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.TextColor;
 import org.jetbrains.annotations.NotNull;
 
 public enum Decoration {
@@ -50,7 +50,7 @@ public enum Decoration {
 		return TextColor.fromRgb(this.color);
 	}
 
-	public @NotNull MutableComponent decor(@NotNull MutableComponent text) {
+	public @NotNull MutableText decor(@NotNull MutableText text) {
 		if (this == NONE) return text;
 		return text.withColor(this.color);
 	}

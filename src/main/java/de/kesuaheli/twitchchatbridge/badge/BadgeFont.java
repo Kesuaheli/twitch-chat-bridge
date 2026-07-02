@@ -1,49 +1,43 @@
 package de.kesuaheli.twitchchatbridge.badge;
 
-import com.mojang.blaze3d.font.GlyphProvider;
-import com.mojang.blaze3d.font.UnbakedGlyph;
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
 import de.kesuaheli.twitchchatbridge.util.Constants;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.font.FontOption;
-import net.minecraft.client.gui.font.FontSet;
-import net.minecraft.client.gui.font.GlyphStitcher;
-import net.minecraft.client.gui.font.providers.BitmapProvider;
-import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.network.chat.FontDescription;
-import net.minecraft.resources.Identifier;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.*;
+import net.minecraft.client.texture.TextureManager;
+import net.minecraft.text.StyleSpriteSource;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
-import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 
-public class BadgeFont implements GlyphProvider {
+public class BadgeFont implements Font {
     public static final Identifier IDENTIFIER = Constants.id("badge");
-    public static final FontDescription.Resource BADGE_FONT = new FontDescription.Resource(BadgeFont.IDENTIFIER);
-    public static FontSet fontStorage;
-    public static final List<GlyphProvider.Conditional> FONT_FILTERS = List.of(new GlyphProvider.Conditional(new BadgeFont(), FontOption.Filter.ALWAYS_PASS));
+    public static final StyleSpriteSource.Font BADGE_FONT = new StyleSpriteSource.Font(BadgeFont.IDENTIFIER);
+    public static FontStorage fontStorage;
+    public static final List<Font.FontFilterPair> FONT_FILTERS = List.of(new Font.FontFilterPair(new BadgeFont(), FontFilterType.FilterMap.NO_FILTER));
     private static final int BADGE_SIZE = 8;
 
     @Override
     public void close() {
-        GlyphProvider.super.close();
+        Font.super.close();
     }
 
     @Nullable
     @Override
-    public UnbakedGlyph getGlyph(int codePoint) {
+    public Glyph getGlyph(int codePoint) {
         Badge badge = TwitchChatMod.BADGES.get(codePoint);
         if (badge == null) {
-            return GlyphProvider.super.getGlyph(codePoint);
+            return Font.super.getGlyph(codePoint);
         }
 
         var image = badge.image();
         int width = image.getWidth();
         int height = image.getHeight();
         float scaleFactor = (float) BADGE_SIZE / width;
-        return new BitmapProvider.Glyph(
+        return new BitmapFont.BitmapFontGlyph(
             scaleFactor,
             image,
             0, 0,
@@ -53,14 +47,14 @@ public class BadgeFont implements GlyphProvider {
     }
 
     @Override
-    public @NonNull IntSet getSupportedGlyphs() {
+    public IntSet getProvidedGlyphs() {
         return TwitchChatMod.BADGES.codePoints();
     }
 
-    public static FontSet newFontStorage(TextureManager textureManager) {
+    public static FontStorage newFontStorage(TextureManager textureManager) {
         Badge.loadBadges();
-        fontStorage = new FontSet(new GlyphStitcher(textureManager, IDENTIFIER));
-        fontStorage.reload(FONT_FILTERS, null);
+        fontStorage = new FontStorage(new GlyphBaker(textureManager, IDENTIFIER));
+        fontStorage.setFonts(FONT_FILTERS, null);
         return fontStorage;
     }
 
@@ -68,13 +62,13 @@ public class BadgeFont implements GlyphProvider {
         if (RenderSystem.isOnRenderThread()) {
             reloadFontStorage();
         } else {
-            Minecraft.getInstance().executeIfPossible(BadgeFont::reloadFontStorage);
+            MinecraftClient.getInstance().executeSync(BadgeFont::reloadFontStorage);
         }
     }
     private static void reloadFontStorage() {
         if (BadgeFont.fontStorage == null) {
-            newFontStorage(Minecraft.getInstance().getTextureManager());
+            newFontStorage(MinecraftClient.getInstance().getTextureManager());
         }
-        BadgeFont.fontStorage.reload(BadgeFont.FONT_FILTERS, null);
+        BadgeFont.fontStorage.setFonts(BadgeFont.FONT_FILTERS, null);
     }
 }

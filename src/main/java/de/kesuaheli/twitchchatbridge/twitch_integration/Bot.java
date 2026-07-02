@@ -10,9 +10,9 @@ import com.github.twitch4j.helix.domain.User;
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
 import de.kesuaheli.twitchchatbridge.badge.Badge;
 import de.kesuaheli.twitchchatbridge.badge.BadgeFont;
-import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextColor;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.text.Text;
+import net.minecraft.text.TextColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -65,11 +65,11 @@ public class Bot {
   public void start() {
     myExecutor.execute(() -> {
       if (!this.checkToken()) {
-        if (Minecraft.getInstance().player == null) {
+        if (MinecraftClient.getInstance().player == null) {
           TwitchChatMod.LOGGER.error("Failed to start Twitch connection: invalid or unsufficient token given, need at least the scopes '{}'", REQUIRED_SCOPES);
         } else {
           TwitchChatMod.addErrorMessage("text.twitchchat.chat.invalid_token",
-            Component.translatable("text.twitchchat.chat.invalid_token.scope_hint", REQUIRED_SCOPES)
+            Text.translatable("text.twitchchat.chat.invalid_token.scope_hint", REQUIRED_SCOPES)
           );
         }
         return;
@@ -127,7 +127,7 @@ public class Bot {
 
   public void onNotice(ChannelNoticeEvent event) {
     System.out.println("TWITCH NOTICE: " + event.toString());
-    TwitchChatMod.addNotification(Component.literal(event.getMessage()));
+    TwitchChatMod.addNotification(Text.literal(event.getMessage()));
   }
 
 
@@ -155,7 +155,7 @@ public class Bot {
     String ID = getUserID(event.getChannel().getName());
     if (Objects.equals(this.channelID, ID)) return;
     this.channelID = ID;
-    TwitchChatMod.addNotification(Component.translatable("text.twitchchat.bot.connected", event.getChannel().getName()));
+    TwitchChatMod.addNotification(Text.translatable("text.twitchchat.bot.connected", event.getChannel().getName()));
   }
 
   public void sendMessage(String message) {

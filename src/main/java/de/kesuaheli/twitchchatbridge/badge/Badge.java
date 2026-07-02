@@ -2,18 +2,18 @@ package de.kesuaheli.twitchchatbridge.badge;
 
 import com.github.twitch4j.helix.domain.ChatBadge;
 import com.github.twitch4j.helix.domain.User;
-import com.mojang.blaze3d.platform.NativeImage;
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.FileToIdConverter;
-import net.minecraft.resources.Identifier;
-import net.minecraft.server.packs.resources.Resource;
-import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.texture.NativeImage;
+import net.minecraft.resource.Resource;
+import net.minecraft.resource.ResourceFinder;
+import net.minecraft.resource.ResourceManager;
+import net.minecraft.text.ClickEvent;
+import net.minecraft.text.HoverEvent;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,8 +30,8 @@ import java.util.regex.Pattern;
 public class Badge {
     private final String name;
     private final String version;
-    private MutableComponent displayName;
-    private Component description;
+    private MutableText displayName;
+    private Text description;
     Map<String, ChannelOverride> channelOverrides = new HashMap<>();
     int codepoint;
     NativeImage image;
@@ -51,7 +51,7 @@ public class Badge {
     public Badge(String name, ChatBadge badgeVersion) throws IOException, URISyntaxException {
         this.name = name;
         this.version = badgeVersion.getId();
-        this.displayName = Component.literal(badgeVersion.getTitle());
+        this.displayName = Text.literal(badgeVersion.getTitle());
         setDescription(badgeVersion.getDescription());
 
         String[] tryURLs = {
@@ -84,7 +84,7 @@ public class Badge {
     public Badge(User user) throws IOException, URISyntaxException {
         this.name = "@"+user.getLogin();
         this.version = "";
-        this.displayName = Component.literal(user.getDisplayName());
+        this.displayName = Text.literal(user.getDisplayName());
         setDescription(user.getDescription());
 
         try {
@@ -177,9 +177,9 @@ public class Badge {
     /**
      * @return The display text of the badge.
      */
-    public MutableComponent getDisplayName() {
+    public MutableText getDisplayName() {
         if (this.displayName == null) {
-            return Component.empty();
+            return Text.empty();
         }
         return this.displayName.copy();
     }
@@ -187,7 +187,7 @@ public class Badge {
     /**
      * @param displayName The updated display text.
      */
-    public void setDisplayName(MutableComponent displayName) {
+    public void setDisplayName(MutableText displayName) {
         this.displayName = displayName;
     }
 
@@ -195,20 +195,20 @@ public class Badge {
      * @param displayName The updated display text.
      */
     public void setDisplayName(String displayName) {
-        setDisplayName(Component.literal(displayName));
+        setDisplayName(Text.literal(displayName));
     }
 
     /**
      * @return Whether the badge has a display name.
      */
     public boolean hasDisplayName() {
-        return this.displayName != null && !Objects.equals(this.getDisplayName().tryCollapseToString(), "");
+        return this.displayName != null && !Objects.equals(this.getDisplayName().getLiteralString(), "");
     }
 
     /**
      * @return The description of the badge.
      */
-    public Component getDescription() {
+    public Text getDescription() {
         return description;
     }
 
@@ -216,26 +216,26 @@ public class Badge {
      * @param description The updated description text.
      */
     public void setDescription(String description) {
-        this.description = Component.literal(description).withStyle(style -> style.withColor(ChatFormatting.GRAY).withItalic(true));
+        this.description = Text.literal(description).styled(style -> style.withColor(Formatting.GRAY).withItalic(true));
     }
 
     /**
      * @return Whether the badge has a description.
      */
     public boolean hasDescription() {
-        return this.getDescription() != null && !Objects.equals(this.getDescription().tryCollapseToString(), "");
+        return this.getDescription() != null && !Objects.equals(this.getDescription().getLiteralString(), "");
     }
 
     public HoverEvent getHoverEvent() {
-        MutableComponent hoverText = Component.literal(this.name);
+        MutableText hoverText = Text.literal(this.name);
         if (this.hasDisplayName()) {
             hoverText = getDisplayName();
         }
         if (this.hasDescription()) {
             hoverText.append("\n").append(this.getDescription());
         }
-        hoverText.append(Component.literal("\ntwitchchat:" + this.name).withStyle(style -> style
-            .withColor(ChatFormatting.DARK_GRAY)
+        hoverText.append(Text.literal("\ntwitchchat:" + this.name).styled(style -> style
+            .withColor(Formatting.DARK_GRAY)
         ));
         return new HoverEvent.ShowText(hoverText);
     }
@@ -264,7 +264,7 @@ public class Badge {
     /**
      * @return The ready to use text component of the badge.
      */
-    public Component toText() {
+    public Text toText() {
         ClickEvent clickEvent = null;
         if (this.name.startsWith("@")) {
             try {
@@ -275,7 +275,7 @@ public class Badge {
             }
         }
         final var finalClickEvent = clickEvent;
-        return Component.literal(this.getChar()).withStyle(style -> style
+        return Text.literal(this.getChar()).styled(style -> style
             .withFont(BadgeFont.BADGE_FONT)
             .withHoverEvent(this.getHoverEvent())
             .withClickEvent(finalClickEvent)
@@ -302,10 +302,10 @@ public class Badge {
      */
     public static void loadBadges() {
         String startingPath = "textures/badge";
-        ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
-        FileToIdConverter finder = new FileToIdConverter(startingPath, ".png");
+        ResourceManager resourceManager = MinecraftClient.getInstance().getResourceManager();
+        ResourceFinder finder = new ResourceFinder(startingPath, ".png");
 
-        Map<Identifier, Resource> resources = finder.listMatchingResources(resourceManager);
+        Map<Identifier, Resource> resources = finder.findResources(resourceManager);
 
         if (resources.isEmpty()) {
             return;
@@ -320,8 +320,8 @@ public class Badge {
 
             // TODO: implement new RP support for badges
             TwitchChatMod.LOGGER.error("resource pack support is currently not working.");
-            TwitchChatMod.addNotification(Component.literal("")
-                .append(Component.literal("Twitch Chat Bridge Warning: ").withStyle(ChatFormatting.RED))
+            TwitchChatMod.addNotification(Text.literal("")
+                .append(Text.literal("Twitch Chat Bridge Warning: ").formatted(Formatting.RED))
                 .append("You tried to load a resource pack with badge override textures, but these are currently not working due to recent structural changes for badges in version 0.20.0b!")
             );
             return;

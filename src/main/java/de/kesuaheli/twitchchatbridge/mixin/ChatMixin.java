@@ -2,8 +2,8 @@ package de.kesuaheli.twitchchatbridge.mixin;
 
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
 import de.kesuaheli.twitchchatbridge.twitch_integration.FormatMessage;
-import net.minecraft.client.gui.screens.ChatScreen;
-import net.minecraft.network.chat.Component;
+import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -15,7 +15,7 @@ import static de.kesuaheli.twitchchatbridge.TwitchChatMod.CONFIG;
 
 @Mixin(ChatScreen.class)
 public class ChatMixin {
-  @Inject(at = @At("HEAD"), method = "handleChatInput", cancellable = true)
+  @Inject(at = @At("HEAD"), method = "sendMessage", cancellable = true)
   private void handleChatInput(String message, boolean addToHistory, CallbackInfo info) {
     String prefix = CONFIG.prefix();
 
@@ -30,7 +30,7 @@ public class ChatMixin {
     info.cancel();
 
     if (TwitchChatMod.bot == null || !TwitchChatMod.bot.isConnected()) {
-      TwitchChatMod.addNotification(Component.translatable("text.twitchchat.chat.integration_disabled"));
+      TwitchChatMod.addNotification(Text.translatable("text.twitchchat.chat.integration_disabled"));
       return;
     }
     message = message.replaceFirst("^"+Pattern.quote(prefix), "");

@@ -1,9 +1,8 @@
 package de.kesuaheli.twitchchatbridge;
 
 import de.kesuaheli.twitchchatbridge.badge.Badge;
-import net.minecraft.server.packs.resources.PreparableReloadListener;
-import net.minecraft.server.packs.resources.ReloadableResourceManager;
-import org.jspecify.annotations.NonNull;
+import net.minecraft.resource.ReloadableResourceManagerImpl;
+import net.minecraft.resource.ResourceReloader;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -12,7 +11,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class TwitchChatResourceReloadListener implements PreparableReloadListener {
+public class TwitchChatResourceReloadListener implements ResourceReloader {
 
   /**
    * Performs a reload. Returns a future that is completed when the reload
@@ -36,11 +35,11 @@ public class TwitchChatResourceReloadListener implements PreparableReloadListene
    * @param synchronizer    the synchronizer
    * @param applyExecutor   the apply executor
    * @return a future for the reload
-   * @see ReloadableResourceManager#createReload(Executor, Executor,
+   * @see ReloadableResourceManagerImpl#reload(Executor, Executor,
    * CompletableFuture, List)
    */
   @Override
-  public @NonNull CompletableFuture<Void> reload(@NonNull SharedState store, @NonNull Executor prepareExecutor, PreparationBarrier synchronizer, @NonNull Executor applyExecutor) {
+  public CompletableFuture<Void> reload(Store store, Executor prepareExecutor, Synchronizer synchronizer, Executor applyExecutor) {
 
     CompletableFuture<Void> preparedAction = CompletableFuture.supplyAsync(() -> {
       TwitchChatMod.BADGES.clearResourcePackOverrides();
@@ -49,7 +48,7 @@ public class TwitchChatResourceReloadListener implements PreparableReloadListene
     }, prepareExecutor);
 
     return preparedAction
-        .thenCompose(synchronizer::wait)
+        .thenCompose(synchronizer::whenPrepared)
         .thenAcceptAsync(void_ -> {}, applyExecutor);
   }
 }

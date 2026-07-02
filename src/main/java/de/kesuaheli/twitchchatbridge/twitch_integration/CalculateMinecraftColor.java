@@ -1,7 +1,7 @@
 package de.kesuaheli.twitchchatbridge.twitch_integration;
 
 
-import net.minecraft.network.chat.TextColor;
+import net.minecraft.text.TextColor;
 
 public class CalculateMinecraftColor {
   public static final TextColor[] DEFAULT_COLORS = new TextColor[]{

@@ -6,7 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.network.chat.Component;
+import net.minecraft.text.Text;
 
 import java.util.Objects;
 
@@ -24,9 +24,9 @@ public class TwitchWatchCommand extends LiteralArgumentBuilder<FabricClientComma
 
   private int executeGet(CommandContext<FabricClientCommandSource> ctx) {
     if (Objects.equals(CONFIG.channel(), "")) {
-      ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.watch.no_channel"));
+      ctx.getSource().sendFeedback(Text.translatable("text.twitchchat.command.watch.no_channel"));
     } else {
-      ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.watch", CONFIG.channel()));
+      ctx.getSource().sendFeedback(Text.translatable("text.twitchchat.command.watch", CONFIG.channel()));
     }
     return 1;
   }
@@ -37,10 +37,10 @@ public class TwitchWatchCommand extends LiteralArgumentBuilder<FabricClientComma
     CONFIG.channel(channelName);
     // Also switch channels if the bot has been initialized
     if (TwitchChatMod.bot != null) {
-      ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.watch.switching", channelName));
+      ctx.getSource().sendFeedback(Text.translatable("text.twitchchat.command.watch.switching", channelName));
       TwitchChatMod.bot.joinChannel(channelName);
     } else {
-      ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.watch.connect_on_enable", channelName));
+      ctx.getSource().sendFeedback(Text.translatable("text.twitchchat.command.watch.connect_on_enable", channelName));
     }
     CONFIG.save();
     return 1;

@@ -5,7 +5,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,7 +24,7 @@ public class PronounDBAPI {
 	private static final String BASE_URL = "https://pronoundb.org/api/v2";
 	private static final String LOOKUP_FORMAT = BASE_URL+"/lookup?platform=%s&ids=%s";
 	private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
-	private static final String USER_AGENT = "Twitch-Chat-Bridge/"+TwitchChatMod.VERSION+" Minecraft/"+ Minecraft.getInstance().getLaunchedVersion();
+	private static final String USER_AGENT = "Twitch-Chat-Bridge/"+TwitchChatMod.VERSION+" Minecraft/"+ MinecraftClient.getInstance().getGameVersion();
 
 	public static @Nullable PronounSet lookup(@NotNull Platform platform, @NotNull String id) {
 		return lookup(platform, new String[]{id}).get(id);

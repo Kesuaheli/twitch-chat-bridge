@@ -6,7 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.network.chat.Component;
+import net.minecraft.text.Text;
 
 import static de.kesuaheli.twitchchatbridge.TwitchChatMod.CONFIG;
 
@@ -21,9 +21,9 @@ public class TwitchBroadcastCommand extends LiteralArgumentBuilder<FabricClientC
 
   private int executeGet(CommandContext<FabricClientCommandSource> ctx) {
     if (CONFIG.broadcast()) {
-      ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.broadcast.currently_enabled"));
+      ctx.getSource().sendFeedback(Text.translatable("text.twitchchat.command.broadcast.currently_enabled"));
     } else {
-      ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.broadcast.currently_disabled"));
+      ctx.getSource().sendFeedback(Text.translatable("text.twitchchat.command.broadcast.currently_disabled"));
     }
     return 1;
   }
@@ -35,9 +35,9 @@ public class TwitchBroadcastCommand extends LiteralArgumentBuilder<FabricClientC
     CONFIG.broadcast(enabled);
     // Also switch channels if the bot has been initialized
     if (enabled) {
-      ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.broadcast.enabled"));
+      ctx.getSource().sendFeedback(Text.translatable("text.twitchchat.command.broadcast.enabled"));
     } else {
-      ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.broadcast.disabled"));
+      ctx.getSource().sendFeedback(Text.translatable("text.twitchchat.command.broadcast.disabled"));
     }
     CONFIG.save();
     return 1;

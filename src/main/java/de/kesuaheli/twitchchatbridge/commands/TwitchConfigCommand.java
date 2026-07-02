@@ -4,9 +4,8 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.network.chat.Component;
-import net.minecraft.util.StringRepresentable;
-import org.jspecify.annotations.NonNull;
+import net.minecraft.text.Text;
+import net.minecraft.util.StringIdentifiable;
 
 import java.util.function.Consumer;
 
@@ -22,18 +21,18 @@ public class TwitchConfigCommand extends LiteralArgumentBuilder<FabricClientComm
   }
 
   private int executeHelp(CommandContext<FabricClientCommandSource> ctx) {
-    ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.config.help"));
+    ctx.getSource().sendFeedback(Text.translatable("text.twitchchat.command.config.help"));
     return 1;
   }
 
-  public enum ConfigOption implements StringRepresentable {
+  public enum ConfigOption implements StringIdentifiable {
     RELOAD(ctx -> {
       CONFIG.load();
-      ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.config.reload"));
+      ctx.getSource().sendFeedback(Text.translatable("text.twitchchat.command.config.reload"));
     }),
     SAVE(ctx -> {
       CONFIG.save();
-      ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.config.save"));
+      ctx.getSource().sendFeedback(Text.translatable("text.twitchchat.command.config.save"));
     });
 
     private final Consumer<CommandContext<FabricClientCommandSource>> consumer;
@@ -52,7 +51,7 @@ public class TwitchConfigCommand extends LiteralArgumentBuilder<FabricClientComm
      * {@return the unique string representation of the enum, used for serialization}
      */
     @Override
-    public @NonNull String getSerializedName() {
+    public String asString() {
       return this.toString().toLowerCase();
     }
   }

@@ -11,11 +11,11 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.server.packs.PackType;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.resource.ResourceType;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +38,7 @@ public class TwitchChatMod implements ModInitializer {
       dispatcher.register(new TwitchBaseCommand()));
 
     // Register reload listener
-    ResourceLoader.get(PackType.CLIENT_RESOURCES)
+    ResourceLoader.get(ResourceType.CLIENT_RESOURCES)
         .registerReloader(Constants.id("reload"), new TwitchChatResourceReloadListener());
 
     if (CONFIG.autoConnect()) {
@@ -57,22 +57,22 @@ public class TwitchChatMod implements ModInitializer {
     bot.start();
   }
 
-  public static void addTwitchMessage(Component message) {
-    if (Minecraft.getInstance().player == null) {
+  public static void addTwitchMessage(Text message) {
+    if (MinecraftClient.getInstance().player == null) {
       return;
     }
 
     if (CONFIG.broadcast()) {
-      if (Minecraft.getInstance().player != null) {
-        Minecraft.getInstance().player.displayClientMessage(message, false);
+      if (MinecraftClient.getInstance().player != null) {
+        MinecraftClient.getInstance().player.sendMessage(message, false);
         return;
       }
     }
 
     if (RenderSystem.isOnRenderThread()) {
-      Minecraft.getInstance().gui.getChat().addMessage(message);
+      MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(message);
     } else {
-      Minecraft.getInstance().executeIfPossible(() -> Minecraft.getInstance().gui.getChat().addMessage(message));
+      MinecraftClient.getInstance().executeSync(() -> MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(message));
     }
   }
 
@@ -82,8 +82,8 @@ public class TwitchChatMod implements ModInitializer {
    * @param message the translation key for the message
    * @param details the details
    */
-  public static void addErrorMessage(String message, MutableComponent details) {
-    addErrorMessage(Component.translatable(message), details);
+  public static void addErrorMessage(String message, MutableText details) {
+    addErrorMessage(Text.translatable(message), details);
   }
 
   /**
@@ -92,30 +92,30 @@ public class TwitchChatMod implements ModInitializer {
    * @param message the message
    * @param details the details
    */
-  public static void addErrorMessage(MutableComponent message, @Nullable MutableComponent details) {
-    message = Component.literal("[ERROR] ")
+  public static void addErrorMessage(MutableText message, @Nullable MutableText details) {
+    message = Text.literal("[ERROR] ")
       .append(message)
-      .withStyle(ChatFormatting.RED);
+      .formatted(Formatting.RED);
     if (details != null && !details.toString().isEmpty()) {
-      message.append(" ").append(details.withStyle(ChatFormatting.WHITE));
+      message.append(" ").append(details.formatted(Formatting.WHITE));
     }
 
     TwitchChatMod.addNotification(message);
   }
 
-  public static void addNotification(MutableComponent message) {
-    if (Minecraft.getInstance().player == null) {
+  public static void addNotification(MutableText message) {
+    if (MinecraftClient.getInstance().player == null) {
       return;
     }
 
     if (message.getStyle().getColor() == null) {
-      message.withStyle(ChatFormatting.DARK_GRAY);
+      message.formatted(Formatting.DARK_GRAY);
     }
 
     if (RenderSystem.isOnRenderThread()) {
-      Minecraft.getInstance().gui.getChat().addMessage(message);
+      MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(message);
     } else {
-      Minecraft.getInstance().executeIfPossible(() -> Minecraft.getInstance().gui.getChat().addMessage(message));
+      MinecraftClient.getInstance().executeSync(() -> MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(message));
     }
   }
 }
