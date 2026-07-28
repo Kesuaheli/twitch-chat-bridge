@@ -22,16 +22,16 @@ public class TwitchEnableCommand extends LiteralArgumentBuilder<FabricClientComm
       return 0;
     }
 
-    if (CONFIG.credentials.oauthKey().isEmpty()) {
+    if (CONFIG.oauthKey.isEmpty()) {
       ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.enable.set_config"));
       return -1;
     }
 
-    if (CONFIG.channel().isEmpty()) {
+    if (CONFIG.channel.isEmpty()) {
       ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.enable.select_channel"));
     }
 
-    TwitchChatMod.bot = new Bot(CONFIG.credentials.oauthKey(), CONFIG.channel());
+    TwitchChatMod.bot = new Bot(CONFIG.oauthKey, CONFIG.channel);
     TwitchChatMod.bot.start();
     ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.enable.connecting").withStyle(ChatFormatting.DARK_GRAY));
     return 1;

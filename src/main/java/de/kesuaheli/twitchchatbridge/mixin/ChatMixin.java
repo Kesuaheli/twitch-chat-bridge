@@ -17,11 +17,9 @@ import static de.kesuaheli.twitchchatbridge.TwitchChatMod.CONFIG;
 public class ChatMixin {
   @Inject(at = @At("HEAD"), method = "handleChatInput", cancellable = true)
   private void handleChatInput(String message, boolean addToRecent, CallbackInfo info) {
-    String prefix = CONFIG.prefix();
-
     // Allow users to write /twitch commands (such as disabling and enabling the mod) when their prefix is "".
-    if (!message.startsWith(prefix) ||
-        prefix.isEmpty() && message.startsWith("/"+ CONFIG.command()+" ")
+    if (!message.startsWith(CONFIG.prefix) ||
+            CONFIG.prefix.isEmpty() && message.startsWith("/"+ CONFIG.command+" ")
     ) {
       return;
     }
@@ -33,7 +31,7 @@ public class ChatMixin {
       TwitchChatMod.addNotification(Component.translatable("text.twitchchat.chat.integration_disabled"));
       return;
     }
-    message = message.replaceFirst("^"+Pattern.quote(prefix), "");
+    message = message.replaceFirst("^"+Pattern.quote(CONFIG.prefix), "");
 
     TwitchChatMod.bot.sendMessage(message); // Send the message to the Twitch IRC Chat
 

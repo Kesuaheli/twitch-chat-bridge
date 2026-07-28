@@ -4,6 +4,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import de.kesuaheli.twitchchatbridge.TwitchChatMod;
+import de.kesuaheli.twitchchatbridge.config.Config;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.network.chat.Component;
@@ -23,26 +24,25 @@ public class TwitchWatchCommand extends LiteralArgumentBuilder<FabricClientComma
   }
 
   private int executeGet(CommandContext<FabricClientCommandSource> ctx) {
-    if (Objects.equals(CONFIG.channel(), "")) {
+    if (Objects.equals(CONFIG.channel, "")) {
       ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.watch.no_channel"));
     } else {
-      ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.watch", CONFIG.channel()));
+      ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.watch", CONFIG.channel));
     }
     return 1;
   }
 
   private int execute(CommandContext<FabricClientCommandSource> ctx) {
-    String channelName = StringArgumentType.getString(ctx, "channel_name");
+    CONFIG.channel = StringArgumentType.getString(ctx, "channel_name");
 
-    CONFIG.channel(channelName);
     // Also switch channels if the bot has been initialized
     if (TwitchChatMod.bot != null) {
-      ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.watch.switching", channelName));
-      TwitchChatMod.bot.joinChannel(channelName);
+      ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.watch.switching", CONFIG.channel));
+      TwitchChatMod.bot.joinChannel(CONFIG.channel);
     } else {
-      ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.watch.connect_on_enable", channelName));
+      ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.watch.connect_on_enable", CONFIG.channel));
     }
-    CONFIG.save();
+    Config.save();
     return 1;
   }
 }
