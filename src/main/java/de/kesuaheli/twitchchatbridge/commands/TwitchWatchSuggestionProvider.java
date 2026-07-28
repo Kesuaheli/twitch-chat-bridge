@@ -17,7 +17,7 @@ public class TwitchWatchSuggestionProvider implements SuggestionProvider<FabricC
 
     @Override
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<FabricClientCommandSource> context, SuggestionsBuilder builder) {
-        if (Minecraft.getInstance().level != null && CONFIG.twitchWatchSuggestions()) {
+        if (Minecraft.getInstance().level != null && CONFIG.twitchWatchSuggestions) {
             List<AbstractClientPlayer> players = Minecraft.getInstance().level.players();
 
             for (AbstractClientPlayer player : players) {

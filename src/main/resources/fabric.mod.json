@@ -20,7 +20,8 @@
 
   "environment": "client",
   "entrypoints": {
-    "main": [ "de.kesuaheli.twitchchatbridge.TwitchChatMod" ]
+    "main": [ "de.kesuaheli.twitchchatbridge.TwitchChatMod" ],
+    "modmenu": [ "de.kesuaheli.twitchchatbridge.config.ModMenuIntegration" ]
   },
   "mixins": [
     "twitchchat.mixins.json"
@@ -31,7 +32,7 @@
     "minecraft": "~${minecraft_version}",
     "fabricloader": ">=${fabric_loader_version}",
     "fabric-api": "*",
-    "owo-lib": ">=${owo_config_version}",
+    "yet_another_config_lib_v3": ">=${yacl_version}",
     "twitch4j": ">=${twitch4j_version}",
     "java": ">=25"
   },
