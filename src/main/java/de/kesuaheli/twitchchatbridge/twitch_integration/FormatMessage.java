@@ -42,14 +42,14 @@ public class FormatMessage {
   }
 
   public static void formatAndSend(Date time, List<Badge> badges, String username, String userID, String message, boolean isActionMessage) {
-    Component formattedMessage = formatMessage(time, getUserAvatarBadge(CONFIG.avatarBadge() ? TwitchChatMod.bot.getChannelID() : null), badges, username, userID, message, isActionMessage);
+    Component formattedMessage = formatMessage(time, getUserAvatarBadge(CONFIG.avatarBadge ? TwitchChatMod.bot.getChannelID() : null), badges, username, userID, message, isActionMessage);
 
     TwitchChatMod.addTwitchMessage(formattedMessage);
   }
 
   public static @Nullable Component formatMessage(AbstractChannelMessageEvent event, boolean isActionMessage) {
     String nick = event.getMessageEvent().getUserDisplayName().orElse(event.getUser().getName());
-    if (CONFIG.ignoreList().stream().anyMatch(nick::equalsIgnoreCase)) {
+    if (CONFIG.ignoreList.stream().anyMatch(nick::equalsIgnoreCase)) {
       return null;
     }
 
@@ -74,7 +74,7 @@ public class FormatMessage {
 
     return formatMessage(
         event.getFiredAt().getTime(),
-        getUserAvatarBadge(event.getSourceChannelId().orElse(CONFIG.avatarBadge() ? event.getMessageEvent().getChannelId() : null)),
+        getUserAvatarBadge(event.getSourceChannelId().orElse(CONFIG.avatarBadge ? event.getMessageEvent().getChannelId() : null)),
         badges,
         nick,
         event.getMessageEvent().getUserId(),
@@ -90,14 +90,14 @@ public class FormatMessage {
 
     MutableComponent text = Component.literal(formatDateTwitch(time));
 
-    MutableComponent prefixText = Component.literal(CONFIG.broadcastPrefix()).withStyle(style -> style.withColor(ChatFormatting.DARK_PURPLE));
+    MutableComponent prefixText = Component.literal(CONFIG.broadcastPrefix).withStyle(style -> style.withColor(ChatFormatting.DARK_PURPLE));
     text.append(prefixText);
 
     text.append(avatar);
 
     MutableComponent usernameText = Component.literal("");
     MutableComponent pronounText = appendPronouns(userID);
-    if (pronounText != null && CONFIG.showPronounsInline()) {
+    if (pronounText != null && CONFIG.showPronounsInline) {
       usernameText.append(pronounText);
     }
     badges.forEach(badge -> usernameText.append(badge.toText()));
@@ -155,7 +155,7 @@ public class FormatMessage {
   }
 
   public static String formatDateTwitch(Date date) {
-    SimpleDateFormat sf = new SimpleDateFormat(CONFIG.dateFormat());
+    SimpleDateFormat sf = new SimpleDateFormat(CONFIG.dateFormat);
     return sf.format(date);
   }
 

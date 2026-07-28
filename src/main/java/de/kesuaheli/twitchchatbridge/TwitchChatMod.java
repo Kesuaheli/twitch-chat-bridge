@@ -3,8 +3,7 @@ package de.kesuaheli.twitchchatbridge;
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.kesuaheli.twitchchatbridge.badge.BadgeSet;
 import de.kesuaheli.twitchchatbridge.commands.TwitchBaseCommand;
-import de.kesuaheli.twitchchatbridge.config.ModConfigFile;
-import de.kesuaheli.twitchchatbridge.config.ModConfig;
+import de.kesuaheli.twitchchatbridge.config.Config;
 import de.kesuaheli.twitchchatbridge.twitch_integration.Bot;
 import de.kesuaheli.twitchchatbridge.util.Constants;
 import net.fabricmc.api.ModInitializer;
@@ -23,15 +22,13 @@ import org.slf4j.LoggerFactory;
 public class TwitchChatMod implements ModInitializer {
   public final static Logger LOGGER = LoggerFactory.getLogger(TwitchChatMod.class);
   public static final String VERSION = FabricLoader.getInstance().getModContainer("twitchchatbridge").orElseThrow().getMetadata().getVersion().getFriendlyString();
-  public static ModConfig CONFIG;
+  public static Config CONFIG = Config.instance();
   public static Bot bot;
   public static final BadgeSet BADGES = new BadgeSet();
 
   @Override
   public void onInitialize() {
-    var hasNewConfig= FabricLoader.getInstance().getConfigDir().resolve("twitchchatbridge/config.json5").toFile().exists();
-    TwitchChatMod.CONFIG = ModConfig.createAndLoad();
-    if (!hasNewConfig) ModConfigFile.loadLegacy();
+    Config.load();
 
     // Register commands
     ClientCommandRegistrationCallback.EVENT.register((dispatcher, buildContext) ->
@@ -41,19 +38,19 @@ public class TwitchChatMod implements ModInitializer {
     ResourceLoader.get(PackType.CLIENT_RESOURCES)
         .registerReloadListener(Constants.id("reload"), new TwitchChatResourceReloadListener());
 
-    if (CONFIG.autoConnect()) {
+    if (CONFIG.autoConnect) {
       autoConnect();
     }
   }
 
   private static void autoConnect() {
-    if (CONFIG.channel().isEmpty() || CONFIG.credentials.oauthKey().isEmpty()) {
-      LOGGER.info("Auto-Connect enabled, but no channel or oauth key set. Please set up your config and enable the bot manually by running \"/{} enable\".", CONFIG.command());
+    if (CONFIG.channel.isEmpty() || CONFIG.oauthKey.isEmpty()) {
+      LOGGER.info("Auto-Connect enabled, but no channel or oauth key set. Please set up your config and enable the bot manually by running \"/{} enable\".", CONFIG.command);
       return;
     }
 
     LOGGER.info("Auto-Connect enabled. Starting bot...");
-    bot = new Bot(CONFIG.credentials.oauthKey(), CONFIG.channel());
+    bot = new Bot(CONFIG.oauthKey, CONFIG.channel);
     bot.start();
   }
 
@@ -62,15 +59,15 @@ public class TwitchChatMod implements ModInitializer {
       return;
     }
 
-    if (CONFIG.broadcast()) {
+    if (CONFIG.broadcast) {
       Minecraft.getInstance().player.connection.sendChat(message.getString());
       return;
     }
 
     if (RenderSystem.isOnRenderThread()) {
-      Minecraft.getInstance().gui.getChat().addClientSystemMessage(message);
+      Minecraft.getInstance().gui.hud.getChat().addClientSystemMessage(message);
     } else {
-      Minecraft.getInstance().executeIfPossible(() -> Minecraft.getInstance().gui.getChat().addClientSystemMessage(message));
+      Minecraft.getInstance().executeIfPossible(() -> Minecraft.getInstance().gui.hud.getChat().addClientSystemMessage(message));
     }
   }
 
@@ -111,9 +108,9 @@ public class TwitchChatMod implements ModInitializer {
     }
 
     if (RenderSystem.isOnRenderThread()) {
-      Minecraft.getInstance().gui.getChat().addClientSystemMessage(message);
+      Minecraft.getInstance().gui.hud.getChat().addClientSystemMessage(message);
     } else {
-      Minecraft.getInstance().executeIfPossible(() -> Minecraft.getInstance().gui.getChat().addClientSystemMessage(message));
+      Minecraft.getInstance().executeIfPossible(() -> Minecraft.getInstance().gui.hud.getChat().addClientSystemMessage(message));
     }
   }
 }

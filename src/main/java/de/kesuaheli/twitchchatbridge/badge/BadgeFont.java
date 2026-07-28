@@ -45,7 +45,7 @@ public class BadgeFont implements GlyphProvider {
         float scaleFactor = (float) BADGE_SIZE / width;
         return new BitmapProvider.Glyph(
             scaleFactor,
-            image,
+            new BitmapProvider.ImageDataHolder(Constants.id("badge_texture"), image),
             0, 0,
             width, height,
             BADGE_SIZE+1,

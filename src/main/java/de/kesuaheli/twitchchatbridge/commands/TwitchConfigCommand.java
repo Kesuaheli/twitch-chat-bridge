@@ -2,6 +2,7 @@ package de.kesuaheli.twitchchatbridge.commands;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import de.kesuaheli.twitchchatbridge.config.Config;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.network.chat.Component;
@@ -9,8 +10,6 @@ import net.minecraft.util.StringRepresentable;
 import org.jspecify.annotations.NonNull;
 
 import java.util.function.Consumer;
-
-import static de.kesuaheli.twitchchatbridge.TwitchChatMod.CONFIG;
 
 public class TwitchConfigCommand extends LiteralArgumentBuilder<FabricClientCommandSource> {
   TwitchConfigCommand() {
@@ -28,11 +27,11 @@ public class TwitchConfigCommand extends LiteralArgumentBuilder<FabricClientComm
 
   public enum ConfigOption implements StringRepresentable {
     RELOAD(ctx -> {
-      CONFIG.load();
+      Config.load();
       ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.config.reload"));
     }),
     SAVE(ctx -> {
-      CONFIG.save();
+      Config.save();
       ctx.getSource().sendFeedback(Component.translatable("text.twitchchat.command.config.save"));
     });
 
